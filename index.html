@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polla Mundial 2026</title>
+<style>
+:root{
+  --marino:#0b2240; --marino2:#14315c; --teal:#0e7c7b; --oro:#c9a227;
+  --fondo:#f4f6f9; --tarjeta:#ffffff; --texto:#1c2733; --gris:#6b7a8c; --linea:#e3e8ef;
+  --ok4:#1e8e3e; --ok3:#1a73e8; --ok2:#c9a227; --ok0:#b0b8c1;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fondo);color:var(--texto);font-size:16px}
+header{background:linear-gradient(135deg,var(--marino),var(--marino2));color:#fff;padding:18px 16px 12px;text-align:center}
+header h1{margin:0;font-size:1.35rem;letter-spacing:.5px}
+header p{margin:6px 0 0;font-size:.85rem;opacity:.85}
+nav{display:flex;background:var(--marino);position:sticky;top:0;z-index:50}
+nav button{flex:1;background:none;border:none;color:#cfd8e3;padding:12px 4px;font-size:.9rem;cursor:pointer;border-bottom:3px solid transparent}
+nav button.activa{color:#fff;border-bottom-color:var(--oro);font-weight:600}
+main{max-width:880px;margin:0 auto;padding:14px 10px 80px}
+.tarjeta{background:var(--tarjeta);border:1px solid var(--linea);border-radius:12px;padding:14px;margin-bottom:14px}
+.tarjeta h2{margin:0 0 10px;font-size:1.05rem;color:var(--marino)}
+.tarjeta h3{margin:14px 0 8px;font-size:.95rem;color:var(--marino)}
+label{font-size:.85rem;color:var(--gris)}
+input[type=text],select{width:100%;padding:10px;border:1px solid var(--linea);border-radius:8px;font-size:1rem;background:#fff;color:var(--texto)}
+.fila-nombre{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.fila-nombre>div{flex:1;min-width:220px}
+.progreso{font-size:.85rem;color:var(--gris);margin-top:8px}
+.barra{height:8px;background:var(--linea);border-radius:4px;overflow:hidden;margin-top:4px}
+.barra>div{height:100%;background:var(--teal);width:0%;transition:width .3s}
+.grupo{background:var(--tarjeta);border:1px solid var(--linea);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.grupo>summary{padding:12px 14px;font-weight:600;color:var(--marino);cursor:pointer;display:flex;justify-content:space-between;align-items:center;list-style:none}
+.grupo>summary::-webkit-details-marker{display:none}
+.grupo>summary .estado{font-size:.8rem;color:var(--gris);font-weight:400}
+.partido{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;padding:10px 12px;border-top:1px solid var(--linea)}
+.partido .meta{grid-column:1/4;font-size:.74rem;color:var(--gris);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
+.equipo{display:flex;align-items:center;gap:6px;font-size:.92rem;min-width:0}
+.equipo.der{justify-content:flex-end;text-align:right}
+.equipo .nombre{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.equipo.tbd .nombre{font-style:italic;color:var(--gris);font-size:.8rem;white-space:normal}
+.marcador{display:flex;align-items:center;gap:4px}
+.marcador input{width:46px;height:42px;text-align:center;font-size:1.15rem;font-weight:600;border:1.5px solid var(--linea);border-radius:8px;color:var(--texto)}
+.marcador input:focus{border-color:var(--teal);outline:none}
+.marcador input:disabled{background:#eef1f5;color:var(--gris)}
+.partido.cerrado{opacity:.75}
+.etiqueta-cerrado{font-size:.7rem;color:#a33;border:1px solid #d9b3b3;border-radius:4px;padding:1px 5px}
+.botones{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+button.principal,button.secundario,button.peligro{padding:11px 16px;border-radius:9px;font-size:.95rem;cursor:pointer;border:none}
+button.principal{background:var(--teal);color:#fff;font-weight:600}
+button.secundario{background:#fff;color:var(--marino);border:1.5px solid var(--marino)}
+button.peligro{background:#fff;color:#a33;border:1.5px solid #d9b3b3}
+.aviso{background:#fdf6e3;border:1px solid #ecd9a0;border-radius:8px;padding:10px;font-size:.85rem;margin:10px 0}
+.exito{background:#e8f5e9;border-color:#bfe3c2}
+table.reglas, table.tabla-pos{width:100%;border-collapse:collapse;font-size:.9rem}
+table.reglas td,table.reglas th,table.tabla-pos td,table.tabla-pos th{border:1px solid var(--linea);padding:8px;text-align:left}
+table.tabla-pos th{background:var(--marino);color:#fff}
+table.tabla-pos td.num{text-align:center}
+table.tabla-pos tr.lider td{background:#fdf8e7}
+.bonos-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.matriz-cont{overflow-x:auto;margin-top:10px}
+table.matriz{border-collapse:collapse;font-size:.78rem;min-width:520px}
+table.matriz th,table.matriz td{border:1px solid var(--linea);padding:4px 6px;text-align:center;white-space:nowrap}
+table.matriz th.fija,table.matriz td.fija{position:sticky;left:0;background:#fff;text-align:left;z-index:2}
+table.matriz thead th{background:var(--marino);color:#fff}
+table.matriz thead th.fija{background:var(--marino)}
+td.p4{background:#d3ecd9;font-weight:700} td.p3{background:#d8e6fb} td.p2{background:#f7edcc} td.p0{background:#f0f2f5;color:var(--gris)}
+.chip{display:inline-block;background:#eef3f9;border:1px solid var(--linea);border-radius:14px;padding:2px 10px;font-size:.8rem;margin:2px}
+.lista-part li{margin:4px 0;font-size:.9rem}
+.lista-part button{margin-left:8px;font-size:.75rem;padding:2px 8px;border-radius:6px;border:1px solid #d9b3b3;background:#fff;color:#a33;cursor:pointer}
+.nota{font-size:.8rem;color:var(--gris)}
+.oculto{display:none}
+footer{text-align:center;font-size:.75rem;color:var(--gris);padding:20px 10px}
+@media (max-width:480px){
+  .equipo{font-size:.82rem}
+  .marcador input{width:40px;height:40px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>POLLA MUNDIAL 2026</h1>
+  <p>Estados Unidos · México · Canadá — 11 de junio al 19 de julio</p>
+</header>
+<nav>
+  <button id="tab-pron" class="activa" onclick="verTab('pron')">Mis pronósticos</button>
+  <button id="tab-reglas" onclick="verTab('reglas')">Reglas</button>
+  <button id="tab-admin" onclick="verTab('admin')">Organizador</button>
+</nav>
+<main>
+
+<!-- Aviso visible SOLO cuando el visor no ejecuta JavaScript (vista previa de WhatsApp/iPhone/OneDrive) -->
+<div id="banner-nojs" class="aviso" style="border-color:#d9a0a0;background:#fdeeee">
+  <strong>Estás viendo una vista previa sin interactividad — así la polla no funciona.</strong><br>
+  · En <strong>computador</strong>: descarga el archivo y ábrelo con Chrome o Edge (doble clic).<br>
+  · En <strong>Android</strong>: descarga el archivo y ábrelo con Chrome.<br>
+  · En <strong>iPhone</strong>: la vista previa de Apple no ejecuta aplicaciones; pide al organizador el <strong>enlace web</strong> y ábrelo en Safari.
+</div>
+<div id="banner-error" class="aviso oculto" style="border-color:#d9a0a0;background:#fdeeee"></div>
+
+<!-- ============ PESTAÑA PRONÓSTICOS ============ -->
+<section id="sec-pron">
+  <div class="tarjeta">
+    <div class="fila-nombre">
+      <div>
+        <label for="nombre">Tu nombre (aparecerá en la tabla de posiciones)</label>
+        <input type="text" id="nombre" placeholder="Ej: Felipe" maxlength="30">
+      </div>
+    </div>
+    <div class="progreso"><span id="prog-texto">0 / 72 partidos pronosticados</span>
+      <div class="barra"><div id="prog-barra"></div></div>
+    </div>
+    <div class="aviso">Cada partido se cierra automáticamente a la hora de su inicio (horarios mostrados en tu hora local). Las eliminatorias se habilitan cuando se conozcan los cruces: el organizador enviará un archivo de actualización para importar aquí.</div>
+    <div class="botones">
+      <button class="principal" onclick="copiarTexto()">Copiar texto para WhatsApp</button>
+      <button class="principal" onclick="exportarPron()">Exportar archivo (.json)</button>
+      <button class="secundario" onclick="document.getElementById('imp-propio').click()">Importar (respaldo o cruces)</button>
+      <input type="file" id="imp-propio" accept=".json" class="oculto" multiple onchange="importarArchivos(this, 'propio')">
+      <button class="peligro" onclick="borrarPron()">Borrar mis pronósticos</button>
+    </div>
+    <div id="msj-pron"></div>
+  </div>
+  <div id="cont-grupos"></div>
+  <div class="tarjeta" id="card-bonos">
+    <h2>Bonos</h2>
+    <div class="bonos-grid">
+      <div><label>Campeón del Mundial (10 pts)</label><select id="bono-campeon"></select></div>
+      <div><label>Finalista 1 (5 pts c/u)</label><select id="bono-fin1"></select></div>
+      <div><label>Finalista 2 (5 pts c/u)</label><select id="bono-fin2"></select></div>
+      <div><label>Goleador del torneo (8 pts)</label><input type="text" id="bono-goleador" placeholder="Ej: Kylian Mbappé"></div>
+      <div><label>Jugador revelación (8 pts)</label><input type="text" id="bono-revelacion" placeholder="Ej: Lamine Yamal"></div>
+    </div>
+    <p class="nota">Los bonos se cierran con el primer partido del Mundial. El "jugador revelación" lo dirime el grupo por consenso al final del torneo.</p>
+  </div>
+</section>
+
+<!-- ============ PESTAÑA REGLAS ============ -->
+<section id="sec-reglas" class="oculto">
+  <div class="tarjeta">
+    <h2>Cómo se juega</h2>
+    <p style="font-size:.92rem">Cada participante pronostica el marcador exacto de los 72 partidos de la fase de grupos antes de que comience cada partido. Cuando se conozcan los cruces de eliminatorias (a partir del 28 de junio), el organizador enviará el archivo de cruces y se pronostican esas rondas, partido a partido. En eliminatorias se pronostica el marcador <strong>al término de los 90 minutos</strong> (el empate es un pronóstico válido).</p>
+    <h3>Puntaje por partido — sistema de tendencia escalonada (Kicktipp)</h3>
+    <table class="reglas">
+      <tr><th>Acierto</th><th>Puntos</th><th>Ejemplo (real: 2-1)</th></tr>
+      <tr><td>Marcador exacto</td><td><strong>4</strong></td><td>Pronosticaste 2-1</td></tr>
+      <tr><td>Diferencia de gol correcta</td><td><strong>3</strong></td><td>Pronosticaste 3-2 (también empates: real 1-1, dijiste 2-2)</td></tr>
+      <tr><td>Solo el ganador</td><td><strong>2</strong></td><td>Pronosticaste 1-0</td></tr>
+      <tr><td>Nada</td><td>0</td><td>Pronosticaste empate o al otro equipo</td></tr>
+    </table>
+    <h3>Bonos (se pronostican antes del primer partido)</h3>
+    <table class="reglas">
+      <tr><td>Campeón del Mundial</td><td><strong>10 pts</strong></td></tr>
+      <tr><td>Cada finalista acertado (sin importar el orden)</td><td><strong>5 pts</strong></td></tr>
+      <tr><td>Goleador del torneo (Bota de Oro)</td><td><strong>8 pts</strong></td></tr>
+      <tr><td>Jugador revelación (lo define el grupo por consenso al final)</td><td><strong>8 pts</strong></td></tr>
+    </table>
+    <p class="nota">En goleador y revelación no importan tildes ni mayúsculas, y basta el apellido ("Mbappé" vale por "Kylian Mbappé"). Si un nombre queda ambiguo, lo dirime el organizador.</p>
+    <h3>Desempates</h3>
+    <ol style="font-size:.92rem">
+      <li>Más marcadores exactos.</li>
+      <li>Más diferencias de gol acertadas.</li>
+      <li>Acertó el campeón.</li>
+      <li>Si persiste, se comparte la posición (y el premio, si lo hay).</li>
+    </ol>
+    <h3>Procedimiento</h3>
+    <ol style="font-size:.92rem">
+      <li>Llena tus pronósticos y bonos en la pestaña "Mis pronósticos".</li>
+      <li>Presiona <strong>"Copiar texto para WhatsApp"</strong> y pégalo en el grupo (transparencia: todos ven lo de todos).</li>
+      <li>Presiona <strong>"Exportar archivo (.json)"</strong> y envía ese archivo al organizador (es el que se usa para computar).</li>
+      <li>El organizador importa todos los archivos, carga los resultados reales y publica la tabla de posiciones.</li>
+    </ol>
+    <p class="nota">Sistema de puntaje basado en el estándar de las pollas europeas (Kicktipp / Sportspoule). Fixture oficial FIFA, verificado el 11-06-2026 (Wikipedia: 2026 FIFA World Cup).</p>
+  </div>
+</section>
+
+<!-- ============ PESTAÑA ORGANIZADOR ============ -->
+<section id="sec-admin" class="oculto">
+  <div class="tarjeta">
+    <h2>1. Participantes</h2>
+    <p class="nota">Importa los archivos .json que te enviaron tus amigos (puedes seleccionar varios a la vez). Si importas dos veces el mismo nombre, se reemplaza por el más reciente.</p>
+    <div class="botones">
+      <button class="principal" onclick="document.getElementById('imp-admin').click()">Importar archivos de pronósticos</button>
+      <input type="file" id="imp-admin" accept=".json" class="oculto" multiple onchange="importarArchivos(this, 'admin')">
+      <button class="secundario" onclick="agregarmeComoParticipante()">Agregar mis propios pronósticos</button>
+    </div>
+    <ul class="lista-part" id="lista-part"></ul>
+    <div id="msj-admin"></div>
+  </div>
+
+  <div class="tarjeta">
+    <h2>2. Resultados reales</h2>
+    <p class="nota">Ingresa los marcadores reales a medida que se juegan los partidos. Se guardan en este navegador y puedes exportarlos como respaldo.</p>
+    <div id="cont-resultados"></div>
+    <h3>Bonos reales (al final del torneo)</h3>
+    <div class="bonos-grid">
+      <div><label>Campeón real</label><select id="real-campeon"></select></div>
+      <div><label>Finalista real 1</label><select id="real-fin1"></select></div>
+      <div><label>Finalista real 2</label><select id="real-fin2"></select></div>
+      <div><label>Goleador real</label><input type="text" id="real-goleador"></div>
+      <div><label>Revelación (consenso del grupo)</label><input type="text" id="real-revelacion"></div>
+    </div>
+    <div class="botones">
+      <button class="secundario" onclick="exportarResultados()">Exportar resultados (.json)</button>
+    </div>
+  </div>
+
+  <div class="tarjeta">
+    <h2>3. Cruces de eliminatorias</h2>
+    <p class="nota">Cuando termine la fase de grupos, define aquí qué equipos juegan cada cruce y exporta el archivo de cruces. Envíalo al grupo: cada amigo lo importa con el botón "Importar" de su pestaña de pronósticos y se le habilitan esos partidos.</p>
+    <div id="cont-cruces"></div>
+    <div class="botones">
+      <button class="principal" onclick="exportarCruces()">Exportar cruces (.json)</button>
+    </div>
+  </div>
+
+  <div class="tarjeta">
+    <h2>4. Tabla de posiciones</h2>
+    <div class="botones">
+      <button class="principal" onclick="calcularTabla()">Calcular / actualizar tabla</button>
+    </div>
+    <div id="cont-tabla"></div>
+    <h3>Detalle partido a partido</h3>
+    <p class="nota">Verde = exacto (4) · Azul = diferencia (3) · Amarillo = ganador (2) · Gris = 0. Solo se muestran partidos con resultado real cargado.</p>
+    <div class="matriz-cont" id="cont-matriz"></div>
+  </div>
+</section>
+
+<footer>Polla Mundial 2026 — archivo autónomo, sin servidor. Los datos se guardan solo en tu navegador.</footer>
+</main>
+
+<script>
+'use strict';
+// Si este script corre, el visor sí ejecuta JavaScript: ocultar el aviso de respaldo
+document.getElementById('banner-nojs').style.display = 'none';
+// Cualquier error posterior se muestra en pantalla (para diagnóstico en celulares)
+window.onerror = function(mensaje, origen, linea){
+  var b = document.getElementById('banner-error');
+  b.classList.remove('oculto');
+  b.textContent = 'Ocurrió un error en la aplicación (línea ' + linea + '): ' + mensaje + ' — avísale al organizador.';
+};
+// ==================== DATOS DEL FIXTURE (FIFA, verificado 11-06-2026) ====================
+const DATOS = {"partidos":[{"fase":"A","utc":"2026-06-11T19:00:00Z","local":"México","visita":"Sudáfrica","sede":"Estadio Azteca, Mexico City","id":"m1"},{"fase":"A","utc":"2026-06-12T02:00:00Z","local":"Corea del Sur","visita":"Chequia","sede":"Estadio Akron, Zapopan","id":"m2"},{"fase":"B","utc":"2026-06-12T19:00:00Z","local":"Canadá","visita":"Bosnia y Herzegovina","sede":"BMO Field, Toronto","id":"m3"},{"fase":"D","utc":"2026-06-13T01:00:00Z","local":"Estados Unidos","visita":"Paraguay","sede":"SoFi Stadium, Inglewood","id":"m4"},{"fase":"B","utc":"2026-06-13T19:00:00Z","local":"Catar","visita":"Suiza","sede":"Levi's Stadium, Santa Clara","id":"m5"},{"fase":"C","utc":"2026-06-13T22:00:00Z","local":"Brasil","visita":"Marruecos","sede":"MetLife Stadium, East Rutherford","id":"m6"},{"fase":"C","utc":"2026-06-14T01:00:00Z","local":"Haití","visita":"Escocia","sede":"Gillette Stadium, Foxborough","id":"m7"},{"fase":"D","utc":"2026-06-14T04:00:00Z","local":"Australia","visita":"Turquía","sede":"BC Place, Vancouver","id":"m8"},{"fase":"E","utc":"2026-06-14T17:00:00Z","local":"Alemania","visita":"Curazao","sede":"NRG Stadium, Houston","id":"m9"},{"fase":"F","utc":"2026-06-14T20:00:00Z","local":"Países Bajos","visita":"Japón","sede":"AT&T Stadium, Arlington","id":"m10"},{"fase":"E","utc":"2026-06-14T23:00:00Z","local":"Costa de Marfil","visita":"Ecuador","sede":"Lincoln Financial Field, Philadelphia","id":"m11"},{"fase":"F","utc":"2026-06-15T02:00:00Z","local":"Suecia","visita":"Túnez","sede":"Estadio BBVA, Guadalupe","id":"m12"},{"fase":"H","utc":"2026-06-15T16:00:00Z","local":"España","visita":"Cabo Verde","sede":"Mercedes-Benz Stadium, Atlanta","id":"m13"},{"fase":"G","utc":"2026-06-15T19:00:00Z","local":"Bélgica","visita":"Egipto","sede":"Lumen Field, Seattle","id":"m14"},{"fase":"H","utc":"2026-06-15T22:00:00Z","local":"Arabia Saudita","visita":"Uruguay","sede":"Hard Rock Stadium, Miami Gardens","id":"m15"},{"fase":"G","utc":"2026-06-16T01:00:00Z","local":"Irán","visita":"Nueva Zelanda","sede":"SoFi Stadium, Inglewood","id":"m16"},{"fase":"I","utc":"2026-06-16T19:00:00Z","local":"Francia","visita":"Senegal","sede":"MetLife Stadium, East Rutherford","id":"m17"},{"fase":"I","utc":"2026-06-16T22:00:00Z","local":"Irak","visita":"Noruega","sede":"Gillette Stadium, Foxborough","id":"m18"},{"fase":"J","utc":"2026-06-17T01:00:00Z","local":"Argentina","visita":"Argelia","sede":"Arrowhead Stadium, Kansas City","id":"m19"},{"fase":"J","utc":"2026-06-17T04:00:00Z","local":"Austria","visita":"Jordania","sede":"Levi's Stadium, Santa Clara","id":"m20"},{"fase":"K","utc":"2026-06-17T17:00:00Z","local":"Portugal","visita":"RD del Congo","sede":"NRG Stadium, Houston","id":"m21"},{"fase":"L","utc":"2026-06-17T20:00:00Z","local":"Inglaterra","visita":"Croacia","sede":"AT&T Stadium, Arlington","id":"m22"},{"fase":"L","utc":"2026-06-17T23:00:00Z","local":"Ghana","visita":"Panamá","sede":"BMO Field, Toronto","id":"m23"},{"fase":"K","utc":"2026-06-18T02:00:00Z","local":"Uzbekistán","visita":"Colombia","sede":"Estadio Azteca, Mexico City","id":"m24"},{"fase":"A","utc":"2026-06-18T16:00:00Z","local":"Chequia","visita":"Sudáfrica","sede":"Mercedes-Benz Stadium, Atlanta","id":"m25"},{"fase":"B","utc":"2026-06-18T19:00:00Z","local":"Suiza","visita":"Bosnia y Herzegovina","sede":"SoFi Stadium, Inglewood","id":"m26"},{"fase":"B","utc":"2026-06-18T22:00:00Z","local":"Canadá","visita":"Catar","sede":"BC Place, Vancouver","id":"m27"},{"fase":"A","utc":"2026-06-19T01:00:00Z","local":"México","visita":"Corea del Sur","sede":"Estadio Akron, Zapopan","id":"m28"},{"fase":"D","utc":"2026-06-19T19:00:00Z","local":"Estados Unidos","visita":"Australia","sede":"Lumen Field, Seattle","id":"m29"},{"fase":"C","utc":"2026-06-19T22:00:00Z","local":"Escocia","visita":"Marruecos","sede":"Gillette Stadium, Foxborough","id":"m30"},{"fase":"C","utc":"2026-06-20T00:30:00Z","local":"Brasil","visita":"Haití","sede":"Lincoln Financial Field, Philadelphia","id":"m31"},{"fase":"D","utc":"2026-06-20T03:00:00Z","local":"Turquía","visita":"Paraguay","sede":"Levi's Stadium, Santa Clara","id":"m32"},{"fase":"F","utc":"2026-06-20T17:00:00Z","local":"Países Bajos","visita":"Suecia","sede":"NRG Stadium, Houston","id":"m33"},{"fase":"E","utc":"2026-06-20T20:00:00Z","local":"Alemania","visita":"Costa de Marfil","sede":"BMO Field, Toronto","id":"m34"},{"fase":"E","utc":"2026-06-21T00:00:00Z","local":"Ecuador","visita":"Curazao","sede":"Arrowhead Stadium, Kansas City","id":"m35"},{"fase":"F","utc":"2026-06-21T04:00:00Z","local":"Túnez","visita":"Japón","sede":"Estadio BBVA, Guadalupe","id":"m36"},{"fase":"H","utc":"2026-06-21T16:00:00Z","local":"España","visita":"Arabia Saudita","sede":"Mercedes-Benz Stadium, Atlanta","id":"m37"},{"fase":"G","utc":"2026-06-21T19:00:00Z","local":"Bélgica","visita":"Irán","sede":"SoFi Stadium, Inglewood","id":"m38"},{"fase":"H","utc":"2026-06-21T22:00:00Z","local":"Uruguay","visita":"Cabo Verde","sede":"Hard Rock Stadium, Miami Gardens","id":"m39"},{"fase":"G","utc":"2026-06-22T01:00:00Z","local":"Nueva Zelanda","visita":"Egipto","sede":"BC Place, Vancouver","id":"m40"},{"fase":"J","utc":"2026-06-22T17:00:00Z","local":"Argentina","visita":"Austria","sede":"AT&T Stadium, Arlington","id":"m41"},{"fase":"I","utc":"2026-06-22T21:00:00Z","local":"Francia","visita":"Irak","sede":"Lincoln Financial Field, Philadelphia","id":"m42"},{"fase":"I","utc":"2026-06-23T00:00:00Z","local":"Noruega","visita":"Senegal","sede":"MetLife Stadium, East Rutherford","id":"m43"},{"fase":"J","utc":"2026-06-23T03:00:00Z","local":"Jordania","visita":"Argelia","sede":"Levi's Stadium, Santa Clara","id":"m44"},{"fase":"K","utc":"2026-06-23T17:00:00Z","local":"Portugal","visita":"Uzbekistán","sede":"NRG Stadium, Houston","id":"m45"},{"fase":"L","utc":"2026-06-23T20:00:00Z","local":"Inglaterra","visita":"Ghana","sede":"Gillette Stadium, Foxborough","id":"m46"},{"fase":"L","utc":"2026-06-23T23:00:00Z","local":"Panamá","visita":"Croacia","sede":"BMO Field, Toronto","id":"m47"},{"fase":"K","utc":"2026-06-24T02:00:00Z","local":"Colombia","visita":"RD del Congo","sede":"Estadio Akron, Zapopan","id":"m48"},{"fase":"B","utc":"2026-06-24T19:00:00Z","local":"Suiza","visita":"Canadá","sede":"BC Place, Vancouver","id":"m49"},{"fase":"B","utc":"2026-06-24T19:00:00Z","local":"Bosnia y Herzegovina","visita":"Catar","sede":"Lumen Field, Seattle","id":"m50"},{"fase":"C","utc":"2026-06-24T22:00:00Z","local":"Escocia","visita":"Brasil","sede":"Hard Rock Stadium, Miami Gardens","id":"m51"},{"fase":"C","utc":"2026-06-24T22:00:00Z","local":"Marruecos","visita":"Haití","sede":"Mercedes-Benz Stadium, Atlanta","id":"m52"},{"fase":"A","utc":"2026-06-25T01:00:00Z","local":"Chequia","visita":"México","sede":"Estadio Azteca, Mexico City","id":"m53"},{"fase":"A","utc":"2026-06-25T01:00:00Z","local":"Sudáfrica","visita":"Corea del Sur","sede":"Estadio BBVA, Guadalupe","id":"m54"},{"fase":"E","utc":"2026-06-25T20:00:00Z","local":"Curazao","visita":"Costa de Marfil","sede":"Lincoln Financial Field, Philadelphia","id":"m55"},{"fase":"E","utc":"2026-06-25T20:00:00Z","local":"Ecuador","visita":"Alemania","sede":"MetLife Stadium, East Rutherford","id":"m56"},{"fase":"F","utc":"2026-06-25T23:00:00Z","local":"Japón","visita":"Suecia","sede":"AT&T Stadium, Arlington","id":"m57"},{"fase":"F","utc":"2026-06-25T23:00:00Z","local":"Túnez","visita":"Países Bajos","sede":"Arrowhead Stadium, Kansas City","id":"m58"},{"fase":"D","utc":"2026-06-26T02:00:00Z","local":"Turquía","visita":"Estados Unidos","sede":"SoFi Stadium, Inglewood","id":"m59"},{"fase":"D","utc":"2026-06-26T02:00:00Z","local":"Paraguay","visita":"Australia","sede":"Levi's Stadium, Santa Clara","id":"m60"},{"fase":"I","utc":"2026-06-26T19:00:00Z","local":"Noruega","visita":"Francia","sede":"Gillette Stadium, Foxborough","id":"m61"},{"fase":"I","utc":"2026-06-26T19:00:00Z","local":"Senegal","visita":"Irak","sede":"BMO Field, Toronto","id":"m62"},{"fase":"H","utc":"2026-06-27T00:00:00Z","local":"Cabo Verde","visita":"Arabia Saudita","sede":"NRG Stadium, Houston","id":"m63"},{"fase":"H","utc":"2026-06-27T00:00:00Z","local":"Uruguay","visita":"España","sede":"Estadio Akron, Zapopan","id":"m64"},{"fase":"G","utc":"2026-06-27T03:00:00Z","local":"Egipto","visita":"Irán","sede":"Lumen Field, Seattle","id":"m65"},{"fase":"G","utc":"2026-06-27T03:00:00Z","local":"Nueva Zelanda","visita":"Bélgica","sede":"BC Place, Vancouver","id":"m66"},{"fase":"L","utc":"2026-06-27T21:00:00Z","local":"Panamá","visita":"Inglaterra","sede":"MetLife Stadium, East Rutherford","id":"m67"},{"fase":"L","utc":"2026-06-27T21:00:00Z","local":"Croacia","visita":"Ghana","sede":"Lincoln Financial Field, Philadelphia","id":"m68"},{"fase":"K","utc":"2026-06-27T23:30:00Z","local":"Colombia","visita":"Portugal","sede":"Hard Rock Stadium, Miami Gardens","id":"m69"},{"fase":"K","utc":"2026-06-27T23:30:00Z","local":"RD del Congo","visita":"Uzbekistán","sede":"Mercedes-Benz Stadium, Atlanta","id":"m70"},{"fase":"J","utc":"2026-06-28T02:00:00Z","local":"Argelia","visita":"Austria","sede":"Arrowhead Stadium, Kansas City","id":"m71"},{"fase":"J","utc":"2026-06-28T02:00:00Z","local":"Jordania","visita":"Argentina","sede":"AT&T Stadium, Arlington","id":"m72"},{"fase":"R32","utc":"2026-06-28T19:00:00Z","local":"2.º Grupo A","visita":"2.º Grupo B","sede":"SoFi Stadium, Inglewood","id":"m73"},{"fase":"R32","utc":"2026-06-29T17:00:00Z","local":"1.º Grupo C","visita":"2.º Grupo F","sede":"NRG Stadium, Houston","id":"m74"},{"fase":"R32","utc":"2026-06-29T20:30:00Z","local":"1.º Grupo E","visita":"3.º Grupos A/B/C/D/F","sede":"Gillette Stadium, Foxborough","id":"m75"},{"fase":"R32","utc":"2026-06-30T01:00:00Z","local":"1.º Grupo F","visita":"2.º Grupo C","sede":"Estadio BBVA, Guadalupe","id":"m76"},{"fase":"R32","utc":"2026-06-30T17:00:00Z","local":"2.º Grupo E","visita":"2.º Grupo I","sede":"AT&T Stadium, Arlington","id":"m77"},{"fase":"R32","utc":"2026-06-30T21:00:00Z","local":"1.º Grupo I","visita":"3.º Grupos C/D/F/G/H","sede":"MetLife Stadium, East Rutherford","id":"m78"},{"fase":"R32","utc":"2026-07-01T01:00:00Z","local":"1.º Grupo A","visita":"3.º Grupos C/E/F/H/I","sede":"Estadio Azteca, Mexico City","id":"m79"},{"fase":"R32","utc":"2026-07-01T16:00:00Z","local":"1.º Grupo L","visita":"3.º Grupos E/H/I/J/K","sede":"Mercedes-Benz Stadium, Atlanta","id":"m80"},{"fase":"R32","utc":"2026-07-01T20:00:00Z","local":"1.º Grupo G","visita":"3.º Grupos A/E/H/I/J","sede":"Lumen Field, Seattle","id":"m81"},{"fase":"R32","utc":"2026-07-02T00:00:00Z","local":"1.º Grupo D","visita":"3.º Grupos B/E/F/I/J","sede":"Levi's Stadium, Santa Clara","id":"m82"},{"fase":"R32","utc":"2026-07-02T19:00:00Z","local":"1.º Grupo H","visita":"2.º Grupo J","sede":"SoFi Stadium, Inglewood","id":"m83"},{"fase":"R32","utc":"2026-07-02T23:00:00Z","local":"2.º Grupo K","visita":"2.º Grupo L","sede":"BMO Field, Toronto","id":"m84"},{"fase":"R32","utc":"2026-07-03T03:00:00Z","local":"1.º Grupo B","visita":"3.º Grupos E/F/G/I/J","sede":"BC Place, Vancouver","id":"m85"},{"fase":"R32","utc":"2026-07-03T18:00:00Z","local":"2.º Grupo D","visita":"2.º Grupo G","sede":"AT&T Stadium, Arlington","id":"m86"},{"fase":"R32","utc":"2026-07-03T22:00:00Z","local":"1.º Grupo J","visita":"2.º Grupo H","sede":"Hard Rock Stadium, Miami Gardens","id":"m87"},{"fase":"R32","utc":"2026-07-04T01:30:00Z","local":"1.º Grupo K","visita":"3.º Grupos D/E/I/J/L","sede":"Arrowhead Stadium, Kansas City","id":"m88"},{"fase":"R16","utc":"2026-07-04T17:00:00Z","local":"Ganador P 73","visita":"Ganador P 75","sede":"NRG Stadium, Houston","id":"m89"},{"fase":"R16","utc":"2026-07-04T21:00:00Z","local":"Ganador P 74","visita":"Ganador P 77","sede":"Lincoln Financial Field, Philadelphia","id":"m90"},{"fase":"R16","utc":"2026-07-05T20:00:00Z","local":"Ganador P 76","visita":"Ganador P 78","sede":"MetLife Stadium, East Rutherford","id":"m91"},{"fase":"R16","utc":"2026-07-06T00:00:00Z","local":"Ganador P 79","visita":"Ganador P 80","sede":"Estadio Azteca, Mexico City","id":"m92"},{"fase":"R16","utc":"2026-07-06T19:00:00Z","local":"Ganador P 83","visita":"Ganador P 84","sede":"AT&T Stadium, Arlington","id":"m93"},{"fase":"R16","utc":"2026-07-07T00:00:00Z","local":"Ganador P 81","visita":"Ganador P 82","sede":"Lumen Field, Seattle","id":"m94"},{"fase":"R16","utc":"2026-07-07T16:00:00Z","local":"Ganador P 86","visita":"Ganador P 88","sede":"Mercedes-Benz Stadium, Atlanta","id":"m95"},{"fase":"R16","utc":"2026-07-07T20:00:00Z","local":"Ganador P 85","visita":"Ganador P 87","sede":"BC Place, Vancouver","id":"m96"},{"fase":"QF","utc":"2026-07-09T20:00:00Z","local":"Ganador P 89","visita":"Ganador P 90","sede":"Gillette Stadium, Foxborough","id":"m97"},{"fase":"QF","utc":"2026-07-10T19:00:00Z","local":"Ganador P 93","visita":"Ganador P 94","sede":"SoFi Stadium, Inglewood","id":"m98"},{"fase":"QF","utc":"2026-07-11T21:00:00Z","local":"Ganador P 91","visita":"Ganador P 92","sede":"Hard Rock Stadium, Miami Gardens","id":"m99"},{"fase":"QF","utc":"2026-07-12T01:00:00Z","local":"Ganador P 95","visita":"Ganador P 96","sede":"Arrowhead Stadium, Kansas City","id":"m100"},{"fase":"SF","utc":"2026-07-14T19:00:00Z","local":"Ganador P 97","visita":"Ganador P 98","sede":"AT&T Stadium, Arlington","id":"m101"},{"fase":"SF","utc":"2026-07-15T19:00:00Z","local":"Ganador P 99","visita":"Ganador P 100","sede":"Mercedes-Benz Stadium, Atlanta","id":"m102"},{"fase":"3P","utc":"2026-07-18T21:00:00Z","local":"Perdedor P 101","visita":"Perdedor P 102","sede":"Hard Rock Stadium, Miami Gardens","id":"m103"},{"fase":"FIN","utc":"2026-07-19T19:00:00Z","local":"Ganador P 101","visita":"Ganador P 102","sede":"MetLife Stadium, East Rutherford","id":"m104"}],"equipos":["Alemania","Arabia Saudita","Argelia","Argentina","Australia","Austria","Bosnia y Herzegovina","Brasil","Bélgica","Cabo Verde","Canadá","Catar","Chequia","Colombia","Corea del Sur","Costa de Marfil","Croacia","Curazao","Ecuador","Egipto","Escocia","España","Estados Unidos","Francia","Ghana","Haití","Inglaterra","Irak","Irán","Japón","Jordania","Marruecos","México","Noruega","Nueva Zelanda","Panamá","Paraguay","Países Bajos","Portugal","RD del Congo","Senegal","Sudáfrica","Suecia","Suiza","Turquía","Túnez","Uruguay","Uzbekistán"],"banderas":{"México":"🇲🇽","Sudáfrica":"🇿🇦","Corea del Sur":"🇰🇷","Chequia":"🇨🇿","Canadá":"🇨🇦","Bosnia y Herzegovina":"🇧🇦","Catar":"🇶🇦","Suiza":"🇨🇭","Brasil":"🇧🇷","Marruecos":"🇲🇦","Haití":"🇭🇹","Escocia":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Estados Unidos":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Turquía":"🇹🇷","Alemania":"🇩🇪","Curazao":"🇨🇼","Costa de Marfil":"🇨🇮","Ecuador":"🇪🇨","Países Bajos":"🇳🇱","Japón":"🇯🇵","Túnez":"🇹🇳","Suecia":"🇸🇪","Bélgica":"🇧🇪","Egipto":"🇪🇬","Irán":"🇮🇷","Nueva Zelanda":"🇳🇿","España":"🇪🇸","Cabo Verde":"🇨🇻","Arabia Saudita":"🇸🇦","Uruguay":"🇺🇾","Francia":"🇫🇷","Senegal":"🇸🇳","Noruega":"🇳🇴","Irak":"🇮🇶","Argentina":"🇦🇷","Argelia":"🇩🇿","Austria":"🇦🇹","Jordania":"🇯🇴","Portugal":"🇵🇹","Colombia":"🇨🇴","Uzbekistán":"🇺🇿","RD del Congo":"🇨🇩","Inglaterra":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Croacia":"🇭🇷","Ghana":"🇬🇭","Panamá":"🇵🇦"}};
+const PARTIDOS = DATOS.partidos, EQUIPOS = DATOS.equipos, BANDERAS = DATOS.banderas;
+const FASES = {R32:'Dieciseisavos de final', R16:'Octavos de final', QF:'Cuartos de final', SF:'Semifinales', '3P':'Tercer puesto', FIN:'Final'};
+const ORDEN_FASES = ['A','B','C','D','E','F','G','H','I','J','K','L','R32','R16','QF','SF','3P','FIN'];
+const PTS_BONO = {campeon:10, finalista:5, goleador:8, revelacion:8};
+
+// ==================== ESTADO (localStorage) ====================
+const K = s => 'polla2026_' + s;
+const lee = (s, def) => { try { const v = localStorage.getItem(K(s)); return v ? JSON.parse(v) : def; } catch(e){ return def; } };
+const guarda = (s, v) => { try { localStorage.setItem(K(s), JSON.stringify(v)); } catch(e){} };
+
+let pron = lee('pron', {});           // {m1:[2,1],...}
+let bonos = lee('bonos', {});         // {campeon, fin1, fin2, goleador, revelacion}
+let cruces = lee('cruces', {});       // {m73:["Francia","Noruega"],...}
+let resultados = lee('res', {});      // {m1:[2,1],...}
+let bonosReales = lee('bonosReales', {});
+let participantes = lee('participantes', []); // [{nombre, exportado, pron, bonos}]
+
+// ==================== UTILIDADES ====================
+const $ = id => document.getElementById(id);
+function equiposDe(m){
+  if (m.fase.length === 1) return [m.local, m.visita];      // grupos: nunca se sobreescriben
+  const c = cruces[m.id];
+  return (Array.isArray(c) && c[0] && c[1]) ? c : null;     // eliminatorias: solo cruces completos
+}
+function definido(m){ return equiposDe(m) !== null; }
+function cerrado(m){ return Date.now() > Date.parse(m.utc); }
+function fmtFecha(utc){
+  return new Date(utc).toLocaleString('es-CL', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+}
+function bandera(eq){ return BANDERAS[eq] || ''; }
+function norm(s){ return (s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function escapaHTML(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function msj(id, texto, ok){
+  $(id).innerHTML = texto ? '<div class="aviso' + (ok ? ' exito' : '') + '">' + texto + '</div>' : '';
+  if (texto) setTimeout(() => { $(id).innerHTML = ''; }, 6000);
+}
+function descarga(nombreArchivo, obj){
+  const blob = new Blob([JSON.stringify(obj, null, 1)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = nombreArchivo;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+// ==================== PUNTAJE (Kicktipp: 4 exacto / 3 diferencia / 2 tendencia) ====================
+function puntosPartido(p, r){
+  if (!Array.isArray(p) || !Array.isArray(r)) return null;
+  const [ph, pa] = p, [rh, ra] = r;
+  if (![ph,pa,rh,ra].every(n => Number.isInteger(n) && n >= 0)) return null;
+  if (ph === rh && pa === ra) return 4;
+  if (Math.sign(ph - pa) !== Math.sign(rh - ra)) return 0;
+  if (ph - pa === rh - ra) return 3;
+  return 2;
+}
+// Nombres de jugador: coinciden si, normalizados (sin tildes/mayúsculas), son iguales
+// o uno contiene al otro ("Mbappé" vale por "Kylian Mbappé"). Casos dudosos los dirime el organizador.
+function igualNombre(a, b){
+  const na = norm(a), nb = norm(b);
+  if (!na || !nb) return false;
+  return na === nb || (na.length > 3 && nb.includes(na)) || (nb.length > 3 && na.includes(nb));
+}
+function puntosBonos(b, br){
+  let pts = 0, det = [];
+  if (!b || !br) return {pts:0, det};
+  if (b.campeon && br.campeon && b.campeon === br.campeon){ pts += PTS_BONO.campeon; det.push('campeón'); }
+  const finReales = [br.fin1, br.fin2].filter(Boolean);
+  const finMios = [b.fin1, b.fin2].filter(Boolean);
+  const usados = new Set();
+  for (const f of finMios){
+    const i = finReales.findIndex((x, idx) => x === f && !usados.has(idx));
+    if (i >= 0){ usados.add(i); pts += PTS_BONO.finalista; det.push('finalista: ' + f); }
+  }
+  if (igualNombre(b.goleador, br.goleador)){ pts += PTS_BONO.goleador; det.push('goleador'); }
+  if (igualNombre(b.revelacion, br.revelacion)){ pts += PTS_BONO.revelacion; det.push('revelación'); }
+  return {pts, det};
+}
+
+// ==================== RENDER: PRONÓSTICOS ====================
+function filaPartido(m, store, prefijo, soloLectura){
+  const eqs = equiposDe(m);
+  const tbd = !eqs;
+  const [eL, eV] = eqs || [m.local, m.visita];
+  const bloqueado = !soloLectura && (tbd || cerrado(m));
+  const v = store[m.id] || ['',''];
+  const dis = bloqueado ? 'disabled' : '';
+  return '<div class="partido' + ((!soloLectura && cerrado(m)) ? ' cerrado' : '') + '">' +
+    '<div class="meta"><span>' + fmtFecha(m.utc) + ' · ' + escapaHTML(m.sede) + '</span>' +
+    ((!soloLectura && cerrado(m) && !tbd) ? '<span class="etiqueta-cerrado">cerrado</span>' : '') +
+    (tbd ? '<span class="etiqueta-cerrado" style="color:var(--gris);border-color:var(--linea)">cruce por definir</span>' : '') +
+    '</div>' +
+    '<div class="equipo' + (tbd?' tbd':'') + '"><span>' + bandera(eL) + '</span><span class="nombre">' + escapaHTML(eL) + '</span></div>' +
+    '<div class="marcador">' +
+    '<input type="number" min="0" max="20" inputmode="numeric" ' + dis + ' value="' + v[0] + '" data-pid="' + m.id + '" data-lado="0" data-store="' + prefijo + '">' +
+    '<span>:</span>' +
+    '<input type="number" min="0" max="20" inputmode="numeric" ' + dis + ' value="' + v[1] + '" data-pid="' + m.id + '" data-lado="1" data-store="' + prefijo + '">' +
+    '</div>' +
+    '<div class="equipo der' + (tbd?' tbd':'') + '"><span class="nombre">' + escapaHTML(eV) + '</span><span>' + bandera(eV) + '</span></div>' +
+    '</div>';
+}
+
+function renderPron(){
+  let html = '';
+  for (const fase of ORDEN_FASES){
+    const ms = PARTIDOS.filter(m => m.fase === fase);
+    if (!ms.length) continue;
+    const titulo = fase.length === 1 ? 'Grupo ' + fase : FASES[fase];
+    const equiposGrupo = fase.length === 1 ? [...new Set(ms.flatMap(m => [m.local, m.visita]))] : null;
+    const completos = ms.filter(m => esValido(pron[m.id])).length;
+    html += '<details class="grupo" data-fase="' + fase + '" ' + (fase.length === 1 ? 'open' : '') + '><summary>' +
+      titulo + '<span class="estado">' + completos + '/' + ms.length + '</span></summary>' +
+      (equiposGrupo ? '<div style="padding:4px 12px">' + equiposGrupo.map(e => '<span class="chip">' + bandera(e) + ' ' + escapaHTML(e) + '</span>').join('') + '</div>' : '') +
+      ms.map(m => filaPartido(m, pron, 'pron', false)).join('') +
+      '</details>';
+  }
+  $('cont-grupos').innerHTML = html;
+  actualizaProgreso();
+}
+function esValido(v){ return Array.isArray(v) && Number.isInteger(v[0]) && Number.isInteger(v[1]) && v[0] >= 0 && v[1] >= 0; }
+
+function actualizaProgreso(){
+  const habilitados = PARTIDOS.filter(m => definido(m));
+  const total = habilitados.length;
+  const hechos = habilitados.filter(m => esValido(pron[m.id])).length;
+  $('prog-texto').textContent = hechos + ' / ' + total + ' partidos pronosticados';
+  $('prog-barra').style.width = (total ? (100 * hechos / total) : 0) + '%';
+}
+
+// Selects de bonos
+function llenaSelect(sel, valor){
+  sel.innerHTML = '<option value="">— elegir —</option>' +
+    EQUIPOS.map(e => '<option value="' + escapaHTML(e) + '"' + (e === valor ? ' selected' : '') + '>' + bandera(e) + ' ' + escapaHTML(e) + '</option>').join('');
+}
+function renderBonos(){
+  llenaSelect($('bono-campeon'), bonos.campeon); llenaSelect($('bono-fin1'), bonos.fin1); llenaSelect($('bono-fin2'), bonos.fin2);
+  $('bono-goleador').value = bonos.goleador || ''; $('bono-revelacion').value = bonos.revelacion || '';
+  const bloqueado = cerrado(PARTIDOS[0]);
+  for (const id of ['bono-campeon','bono-fin1','bono-fin2','bono-goleador','bono-revelacion']) $(id).disabled = bloqueado;
+}
+
+// ==================== ENTRADAS (delegación) ====================
+document.addEventListener('input', ev => {
+  const t = ev.target;
+  if (t.dataset && t.dataset.pid){
+    const store = t.dataset.store === 'pron' ? pron : resultados;
+    const id = t.dataset.pid, lado = +t.dataset.lado;
+    const par = store[id] || ['',''];
+    const n = t.value === '' ? '' : Math.max(0, Math.min(20, parseInt(t.value, 10) || 0));
+    if (n !== '' && String(n) !== t.value) t.value = n;  // reflejar el valor realmente guardado
+    par[lado] = n; store[id] = par;
+    if (t.dataset.store === 'pron'){ guarda('pron', pron); actualizaProgresoYContadores(); }
+    else guarda('res', resultados);
+    return;
+  }
+  if (t.id === 'nombre') guarda('nombre', t.value);
+  if (t.id.startsWith('bono-')){
+    bonos = {campeon:$('bono-campeon').value, fin1:$('bono-fin1').value, fin2:$('bono-fin2').value,
+             goleador:$('bono-goleador').value, revelacion:$('bono-revelacion').value};
+    guarda('bonos', bonos);
+  }
+  if (t.id.startsWith('real-')){
+    bonosReales = {campeon:$('real-campeon').value, fin1:$('real-fin1').value, fin2:$('real-fin2').value,
+                   goleador:$('real-goleador').value, revelacion:$('real-revelacion').value};
+    guarda('bonosReales', bonosReales);
+  }
+  if (t.dataset && t.dataset.cruce){
+    const id = t.dataset.cruce, lado = +t.dataset.lado;
+    const par = cruces[id] || ['',''];
+    par[lado] = t.value;
+    if (par[0] || par[1]) cruces[id] = par; else delete cruces[id];
+    guarda('cruces', cruces);
+  }
+});
+function actualizaProgresoYContadores(){
+  actualizaProgreso();
+  // actualizar contadores de cada grupo sin re-render completo
+  document.querySelectorAll('#cont-grupos details.grupo').forEach(d => {
+    const fase = d.dataset.fase;
+    const ms = PARTIDOS.filter(m => m.fase === fase);
+    const completos = ms.filter(m => esValido(pron[m.id])).length;
+    d.querySelector('.estado').textContent = completos + '/' + ms.length;
+  });
+}
+// Re-evalúa los candados cada 30 s: si un partido comenzó con la página abierta, se bloquea igual
+function refrescaCandados(){
+  let huboCambio = false;
+  document.querySelectorAll('#cont-grupos input[data-pid]:not(:disabled)').forEach(inp => {
+    const m = PARTIDOS.find(x => x.id === inp.dataset.pid);
+    if (m && cerrado(m)){ inp.disabled = true; huboCambio = true; }
+  });
+  if (huboCambio) renderPron();           // repinta para mostrar la etiqueta "cerrado"
+  if (cerrado(PARTIDOS[0])) for (const id of ['bono-campeon','bono-fin1','bono-fin2','bono-goleador','bono-revelacion']) $(id).disabled = true;
+}
+setInterval(refrescaCandados, 30000);
+
+// ==================== EXPORTAR / TEXTO ====================
+function nombreActual(){ return ($('nombre').value || '').trim(); }
+function exigeNombre(){
+  const n = nombreActual();
+  if (!n){ msj('msj-pron', 'Escribe tu nombre antes de exportar.'); $('nombre').focus(); return null; }
+  return n;
+}
+function exportarPron(){
+  const n = exigeNombre(); if (!n) return;
+  const habilitados = PARTIDOS.filter(m => definido(m));
+  const faltan = habilitados.filter(m => !esValido(pron[m.id])).length;
+  if (faltan > 0 && !confirm('Te faltan ' + faltan + ' partidos por pronosticar. ¿Exportar igual?')) return;
+  const limpio = {};
+  for (const m of habilitados) if (esValido(pron[m.id])) limpio[m.id] = pron[m.id];
+  descarga('polla2026_' + norm(n).replace(/\s+/g,'_') + '.json',
+    {tipo:'pronosticos', version:1, nombre:n, exportado:new Date().toISOString(), pron:limpio, bonos});
+  msj('msj-pron', 'Archivo exportado. Envíaselo al organizador.', true);
+}
+function textoPron(){
+  const n = nombreActual() || '(sin nombre)';
+  let lineas = ['POLLA MUNDIAL 2026 — Pronósticos de ' + n];
+  for (const fase of ORDEN_FASES){
+    const ms = PARTIDOS.filter(m => m.fase === fase && definido(m) && esValido(pron[m.id]));
+    if (!ms.length) continue;
+    lineas.push('', (fase.length === 1 ? 'GRUPO ' + fase : FASES[fase].toUpperCase()));
+    for (const m of ms){
+      const [eL, eV] = equiposDe(m);
+      const d = new Date(m.utc).toLocaleDateString('es-CL', {day:'numeric', month:'short'});
+      lineas.push(d + ' · ' + eL + ' ' + pron[m.id][0] + '-' + pron[m.id][1] + ' ' + eV);
+    }
+  }
+  const b = [];
+  if (bonos.campeon) b.push('Campeón: ' + bonos.campeon);
+  if (bonos.fin1 || bonos.fin2) b.push('Finalistas: ' + [bonos.fin1, bonos.fin2].filter(Boolean).join(' y '));
+  if (bonos.goleador) b.push('Goleador: ' + bonos.goleador);
+  if (bonos.revelacion) b.push('Revelación: ' + bonos.revelacion);
+  if (b.length){ lineas.push('', 'BONOS'); lineas.push(...b); }
+  return lineas.join('\n');
+}
+function copiarTexto(){
+  const txt = textoPron();
+  const fin = () => msj('msj-pron', 'Texto copiado. Pégalo en el grupo de WhatsApp.', true);
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(fin, () => copiaFallback(txt, fin));
+  } else copiaFallback(txt, fin);
+}
+function copiaFallback(txt, fin){
+  const ta = document.createElement('textarea');
+  ta.value = txt; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); fin(); } catch(e){ alert(txt); }
+  ta.remove();
+}
+function borrarPron(){
+  if (!confirm('¿Borrar todos tus pronósticos y bonos de este navegador?')) return;
+  pron = {}; bonos = {}; guarda('pron', pron); guarda('bonos', bonos);
+  renderPron(); renderBonos();
+}
+
+// ==================== IMPORTAR ====================
+function importarArchivos(input, destino){
+  const archivos = [...input.files];
+  input.value = '';
+  let pendientes = archivos.length, resumen = [];
+  for (const f of archivos){
+    const lector = new FileReader();
+    const cierra = () => {
+      if (--pendientes === 0){
+        msj(destino === 'admin' ? 'msj-admin' : 'msj-pron', resumen.join('<br>'), true);
+        renderTodo();
+      }
+    };
+    lector.onload = () => {
+      try { resumen.push(procesaImport(JSON.parse(lector.result), destino)); }
+      catch(e){ resumen.push('"' + escapaHTML(f.name) + '": archivo no válido'); }
+      cierra();
+    };
+    lector.onerror = () => { resumen.push('"' + escapaHTML(f.name) + '": no se pudo leer'); cierra(); };
+    lector.readAsText(f);
+  }
+}
+function procesaImport(d, destino){
+  if (d.tipo === 'cruces' && d.cruces){
+    cruces = Object.assign({}, cruces, d.cruces); guarda('cruces', cruces);
+    return 'Cruces de eliminatorias actualizados (' + Object.keys(d.cruces).length + ' partidos).';
+  }
+  if (d.tipo === 'resultados' && d.res){
+    resultados = d.res; bonosReales = d.bonosReales || bonosReales;
+    guarda('res', resultados); guarda('bonosReales', bonosReales);
+    return 'Resultados reales importados (' + Object.keys(d.res).length + ' partidos).';
+  }
+  if (d.tipo === 'pronosticos' && d.nombre){
+    const pronLimpio = sanitizaPron(d.pron || {});
+    if (destino === 'admin'){
+      participantes = participantes.filter(p => norm(p.nombre) !== norm(d.nombre));
+      participantes.push({nombre:String(d.nombre).slice(0,30), exportado:d.exportado || '', pron:pronLimpio, bonos:d.bonos || {}});
+      guarda('participantes', participantes);
+      return 'Pronósticos de "' + escapaHTML(d.nombre) + '" importados (' + Object.keys(pronLimpio).length + ' partidos válidos).';
+    }
+    pron = pronLimpio; bonos = d.bonos || {};
+    guarda('pron', pron); guarda('bonos', bonos);
+    if (d.nombre){ $('nombre').value = d.nombre; guarda('nombre', d.nombre); }
+    return 'Respaldo de "' + escapaHTML(d.nombre) + '" restaurado.';
+  }
+  return 'Archivo no reconocido (tipo: ' + escapaHTML(String(d.tipo)) + ').';
+}
+// Acepta solo pares de enteros 0..20 en ids de partido conocidos; convierte "2" (texto) en 2
+function sanitizaPron(obj){
+  const idsValidos = new Set(PARTIDOS.map(m => m.id));
+  const limpio = {};
+  for (const [id, v] of Object.entries(obj)){
+    if (!idsValidos.has(id) || !Array.isArray(v)) continue;
+    const esNum = x => typeof x === 'number' || (typeof x === 'string' && x.trim() !== '');
+    if (!esNum(v[0]) || !esNum(v[1])) continue;
+    const a = Number(v[0]), b = Number(v[1]);
+    if (Number.isInteger(a) && Number.isInteger(b) && a >= 0 && a <= 20 && b >= 0 && b <= 20) limpio[id] = [a, b];
+  }
+  return limpio;
+}
+
+// ==================== ORGANIZADOR ====================
+function renderParticipantes(){
+  $('lista-part').innerHTML = participantes.length
+    ? participantes.map((p, i) => '<li><strong>' + escapaHTML(p.nombre) + '</strong> — ' +
+        Object.keys(p.pron).length + ' pronósticos' +
+        ((p.exportado && !isNaN(Date.parse(p.exportado))) ? ' (exportado ' + new Date(p.exportado).toLocaleString('es-CL') + ')' : '') +
+        '<button onclick="quitarParticipante(' + i + ')">quitar</button></li>').join('')
+    : '<li class="nota">Aún no hay participantes importados.</li>';
+}
+function quitarParticipante(i){
+  participantes.splice(i, 1); guarda('participantes', participantes);
+  renderParticipantes();
+}
+function agregarmeComoParticipante(){
+  const n = nombreActual();
+  if (!n){ msj('msj-admin', 'Primero escribe tu nombre en la pestaña "Mis pronósticos".'); return; }
+  procesaImport(JSON.parse(JSON.stringify({tipo:'pronosticos', nombre:n, exportado:new Date().toISOString(), pron, bonos})), 'admin');
+  renderParticipantes();
+  msj('msj-admin', 'Tus pronósticos fueron agregados como participante "' + escapaHTML(n) + '".', true);
+}
+function renderResultados(){
+  let html = '';
+  for (const fase of ORDEN_FASES){
+    const ms = PARTIDOS.filter(m => m.fase === fase && definido(m));
+    if (!ms.length) continue;
+    const titulo = fase.length === 1 ? 'Grupo ' + fase : FASES[fase];
+    const conRes = ms.filter(m => esValido(resultados[m.id])).length;
+    html += '<details class="grupo"><summary>' + titulo + '<span class="estado">' + conRes + '/' + ms.length + ' resultados</span></summary>' +
+      ms.map(m => filaPartido(m, resultados, 'res', true)).join('') + '</details>';
+  }
+  $('cont-resultados').innerHTML = html || '<p class="nota">Sin partidos definidos.</p>';
+}
+function renderCruces(){
+  let html = '';
+  for (const fase of ['R32','R16','QF','SF','3P','FIN']){
+    const ms = PARTIDOS.filter(m => m.fase === fase);
+    html += '<h3>' + FASES[fase] + '</h3>';
+    for (const m of ms){
+      const v = cruces[m.id] || ['',''];
+      const ops = sel => '<option value="">' + '—' + '</option>' + EQUIPOS.map(e =>
+        '<option value="' + escapaHTML(e) + '"' + (e === sel ? ' selected' : '') + '>' + escapaHTML(e) + '</option>').join('');
+      html += '<div class="partido"><div class="meta"><span>' + fmtFecha(m.utc) + ' · ' + escapaHTML(m.sede) +
+        ' · <em>' + escapaHTML(m.local) + ' vs ' + escapaHTML(m.visita) + '</em></span></div>' +
+        '<div><select data-cruce="' + m.id + '" data-lado="0">' + ops(v[0]) + '</select></div>' +
+        '<div style="text-align:center">vs</div>' +
+        '<div><select data-cruce="' + m.id + '" data-lado="1">' + ops(v[1]) + '</select></div></div>';
+    }
+  }
+  $('cont-cruces').innerHTML = html;
+}
+function exportarCruces(){
+  const definidos = {};
+  for (const [id, par] of Object.entries(cruces)) if (par[0] && par[1]) definidos[id] = par;
+  if (!Object.keys(definidos).length){ msj('msj-admin', 'No hay cruces completos que exportar.'); return; }
+  descarga('polla2026_cruces.json', {tipo:'cruces', version:1, exportado:new Date().toISOString(), cruces:definidos});
+}
+function exportarResultados(){
+  descarga('polla2026_resultados.json', {tipo:'resultados', version:1, exportado:new Date().toISOString(), res:resultados, bonosReales});
+}
+function renderBonosReales(){
+  llenaSelect($('real-campeon'), bonosReales.campeon); llenaSelect($('real-fin1'), bonosReales.fin1); llenaSelect($('real-fin2'), bonosReales.fin2);
+  $('real-goleador').value = bonosReales.goleador || ''; $('real-revelacion').value = bonosReales.revelacion || '';
+}
+
+// ==================== TABLA DE POSICIONES ====================
+function calcularTabla(){
+  const jugados = PARTIDOS.filter(m => esValido(resultados[m.id]));
+  const filas = participantes.map(p => {
+    let pts = 0, e4 = 0, d3 = 0, t2 = 0;
+    for (const m of jugados){
+      const pu = puntosPartido(p.pron[m.id], resultados[m.id]);
+      if (pu === null) continue;
+      pts += pu;
+      if (pu === 4) e4++; else if (pu === 3) d3++; else if (pu === 2) t2++;
+    }
+    const b = puntosBonos(p.bonos, bonosReales);
+    return {nombre:p.nombre, pts:pts + b.pts, e4, d3, t2, bonos:b.pts, detBonos:b.det,
+            acertoCampeon: !!(p.bonos && bonosReales && p.bonos.campeon && p.bonos.campeon === bonosReales.campeon)};
+  });
+  filas.sort((a, b) => b.pts - a.pts || b.e4 - a.e4 || b.d3 - a.d3 || (b.acertoCampeon - a.acertoCampeon) || a.nombre.localeCompare(b.nombre));
+  if (!filas.length){ $('cont-tabla').innerHTML = '<p class="nota">Importa participantes primero.</p>'; $('cont-matriz').innerHTML = ''; return; }
+  let html = '<p class="nota">' + jugados.length + ' partidos con resultado cargado.</p><table class="tabla-pos"><tr><th>#</th><th>Participante</th><th>Pts</th><th>Exactos</th><th>Difs</th><th>Ganador</th><th>Bonos</th></tr>';
+  let pos = 0, prevPts = null;
+  filas.forEach((f, i) => {
+    if (f.pts !== prevPts){ pos = i + 1; prevPts = f.pts; }
+    html += '<tr' + (pos === 1 ? ' class="lider"' : '') + '><td class="num">' + pos + '</td><td>' + escapaHTML(f.nombre) +
+      '</td><td class="num"><strong>' + f.pts + '</strong></td><td class="num">' + f.e4 + '</td><td class="num">' + f.d3 +
+      '</td><td class="num">' + f.t2 + '</td><td class="num" title="' + escapaHTML(f.detBonos.join(', ')) + '">' + f.bonos + '</td></tr>';
+  });
+  $('cont-tabla').innerHTML = html + '</table>';
+  renderMatriz(jugados, filas.map(f => f.nombre));
+}
+function renderMatriz(jugados, ordenNombres){
+  if (!jugados.length || !participantes.length){ $('cont-matriz').innerHTML = ''; return; }
+  const porNombre = {}; participantes.forEach(p => porNombre[p.nombre] = p);
+  let html = '<table class="matriz"><thead><tr><th class="fija">Partido</th><th>Real</th>' +
+    ordenNombres.map(n => '<th>' + escapaHTML(n) + '</th>').join('') + '</tr></thead><tbody>';
+  for (const m of jugados){
+    const [eL, eV] = equiposDe(m) || [m.local, m.visita];
+    const r = resultados[m.id];
+    html += '<tr><td class="fija">' + bandera(eL) + ' ' + escapaHTML(eL) + ' - ' + escapaHTML(eV) + ' ' + bandera(eV) +
+      '</td><td><strong>' + r[0] + '-' + r[1] + '</strong></td>';
+    for (const n of ordenNombres){
+      const p = porNombre[n].pron[m.id];
+      const pu = puntosPartido(p, r);
+      html += pu === null ? '<td class="p0">—</td>' : '<td class="p' + pu + '">' + p[0] + '-' + p[1] + '</td>';
+    }
+    html += '</tr>';
+  }
+  $('cont-matriz').innerHTML = html + '</tbody></table>';
+}
+
+// ==================== PESTAÑAS Y ARRANQUE ====================
+function verTab(t){
+  for (const s of ['pron','reglas','admin']){
+    $('sec-' + s).classList.toggle('oculto', s !== t);
+    $('tab-' + s).classList.toggle('activa', s === t);
+  }
+  if (t === 'admin'){ renderParticipantes(); renderResultados(); renderCruces(); renderBonosReales(); }
+}
+function renderTodo(){
+  renderPron(); renderBonos();
+  if (!$('sec-admin').classList.contains('oculto')){ renderParticipantes(); renderResultados(); renderCruces(); renderBonosReales(); }
+}
+$('nombre').value = lee('nombre', '');
+renderTodo();
+</script>
+</body>
+</html>
