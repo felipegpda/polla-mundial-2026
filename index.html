@@ -110,7 +110,7 @@ footer{text-align:center;font-size:.75rem;color:var(--gris);padding:20px 10px}
     <div class="progreso"><span id="prog-texto">0 / 72 partidos pronosticados</span>
       <div class="barra"><div id="prog-barra"></div></div>
     </div>
-    <div class="aviso">Cada partido se cierra automáticamente a la hora de su inicio (horarios mostrados en tu hora local). Las eliminatorias se habilitan cuando se conozcan los cruces: el organizador enviará un archivo de actualización para importar aquí.</div>
+    <div class="aviso">Cada partido se cierra automáticamente a la hora de su inicio (horarios mostrados en tu hora local). Excepción inicial: el partido inaugural se puede pronosticar hasta las 16:00 de Chile del 11-jun, y los bonos hasta el 12-jun a las 23:59. Las eliminatorias se habilitan cuando se conozcan los cruces: el organizador enviará un archivo de actualización para importar aquí.</div>
     <div class="botones">
       <button class="principal" onclick="copiarTexto()">Copiar texto para WhatsApp</button>
       <button class="principal" onclick="exportarPron()">Exportar archivo (.json)</button>
@@ -130,7 +130,7 @@ footer{text-align:center;font-size:.75rem;color:var(--gris);padding:20px 10px}
       <div><label>Goleador del torneo (8 pts)</label><input type="text" id="bono-goleador" placeholder="Ej: Kylian Mbappé"></div>
       <div><label>Jugador revelación (8 pts)</label><input type="text" id="bono-revelacion" placeholder="Ej: Lamine Yamal"></div>
     </div>
-    <p class="nota">Los bonos se cierran con el primer partido del Mundial. El "jugador revelación" lo dirime el grupo por consenso al final del torneo.</p>
+    <p class="nota">Los bonos se cierran el viernes 12 de junio a las 23:59 (hora de Chile). El "jugador revelación" lo dirime el grupo por consenso al final del torneo.</p>
   </div>
 </section>
 
@@ -147,7 +147,7 @@ footer{text-align:center;font-size:.75rem;color:var(--gris);padding:20px 10px}
       <tr><td>Solo el ganador</td><td><strong>2</strong></td><td>Pronosticaste 1-0</td></tr>
       <tr><td>Nada</td><td>0</td><td>Pronosticaste empate o al otro equipo</td></tr>
     </table>
-    <h3>Bonos (se pronostican antes del primer partido)</h3>
+    <h3>Bonos (se pronostican hasta el 12 de junio, 23:59 hora de Chile)</h3>
     <table class="reglas">
       <tr><td>Campeón del Mundial</td><td><strong>10 pts</strong></td></tr>
       <tr><td>Cada finalista acertado (sin importar el orden)</td><td><strong>5 pts</strong></td></tr>
@@ -265,7 +265,11 @@ function equiposDe(m){
   return (Array.isArray(c) && c[0] && c[1]) ? c : null;     // eliminatorias: solo cruces completos
 }
 function definido(m){ return equiposDe(m) !== null; }
-function cerrado(m){ return Date.now() > Date.parse(m.utc); }
+// Cierres especiales fijados por el organizador (UTC); si un partido no aparece aquí, cierra a su hora de inicio
+const CIERRES_ESPECIALES = { m1: '2026-06-11T20:00:00Z' };      // inaugural: gracia hasta las 16:00 de Chile
+const CIERRE_BONOS = '2026-06-13T03:59:00Z';                    // bonos: hasta el 12-jun 23:59 hora de Chile
+function cerrado(m){ return Date.now() > Date.parse(CIERRES_ESPECIALES[m.id] || m.utc); }
+function bonosCerrados(){ return Date.now() > Date.parse(CIERRE_BONOS); }
 function fmtFecha(utc){
   return new Date(utc).toLocaleString('es-CL', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
 }
@@ -375,7 +379,7 @@ function llenaSelect(sel, valor){
 function renderBonos(){
   llenaSelect($('bono-campeon'), bonos.campeon); llenaSelect($('bono-fin1'), bonos.fin1); llenaSelect($('bono-fin2'), bonos.fin2);
   $('bono-goleador').value = bonos.goleador || ''; $('bono-revelacion').value = bonos.revelacion || '';
-  const bloqueado = cerrado(PARTIDOS[0]);
+  const bloqueado = bonosCerrados();
   for (const id of ['bono-campeon','bono-fin1','bono-fin2','bono-goleador','bono-revelacion']) $(id).disabled = bloqueado;
 }
 
@@ -430,7 +434,7 @@ function refrescaCandados(){
     if (m && cerrado(m)){ inp.disabled = true; huboCambio = true; }
   });
   if (huboCambio) renderPron();           // repinta para mostrar la etiqueta "cerrado"
-  if (cerrado(PARTIDOS[0])) for (const id of ['bono-campeon','bono-fin1','bono-fin2','bono-goleador','bono-revelacion']) $(id).disabled = true;
+  if (bonosCerrados()) for (const id of ['bono-campeon','bono-fin1','bono-fin2','bono-goleador','bono-revelacion']) $(id).disabled = true;
 }
 setInterval(refrescaCandados, 30000);
 
