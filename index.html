@@ -83,7 +83,8 @@ footer{text-align:center;font-size:.75rem;color:var(--gris);padding:20px 10px}
   <p>Estados Unidos · México · Canadá — 11 de junio al 19 de julio</p>
 </header>
 <nav>
-  <button id="tab-pron" class="activa" onclick="verTab('pron')">Mis pronósticos</button>
+  <button id="tab-pron" class="activa" onclick="verTab('pron')">Pronósticos</button>
+  <button id="tab-tabla" onclick="verTab('tabla')">Tabla</button>
   <button id="tab-reglas" onclick="verTab('reglas')">Reglas</button>
   <button id="tab-admin" onclick="verTab('admin')">Organizador</button>
 </nav>
@@ -131,6 +132,24 @@ footer{text-align:center;font-size:.75rem;color:var(--gris);padding:20px 10px}
       <div><label>Jugador revelación (8 pts)</label><input type="text" id="bono-revelacion" placeholder="Ej: Lamine Yamal"></div>
     </div>
     <p class="nota">Los bonos se cierran el viernes 12 de junio a las 23:59 (hora de Chile). El "jugador revelación" lo dirime el grupo por consenso al final del torneo.</p>
+  </div>
+</section>
+
+<!-- ============ PESTAÑA TABLA (pública, datos publicados por el organizador) ============ -->
+<section id="sec-tabla" class="oculto">
+  <div class="tarjeta">
+    <h2>Tabla de posiciones</h2>
+    <div id="pub-info" class="nota" style="margin-bottom:8px"></div>
+    <div id="pub-tabla"></div>
+  </div>
+  <div class="tarjeta">
+    <h2>Bonos de cada jugador</h2>
+    <div class="matriz-cont" id="pub-bonos"></div>
+  </div>
+  <div class="tarjeta">
+    <h2>Pronósticos partido a partido</h2>
+    <p class="nota">Verde = exacto (4) · Azul = diferencia (3) · Amarillo = ganador (2) · Gris = 0. Solo partidos con resultado cargado por el organizador.</p>
+    <div class="matriz-cont" id="pub-matriz"></div>
   </div>
 </section>
 
@@ -215,8 +234,10 @@ footer{text-align:center;font-size:.75rem;color:var(--gris);padding:20px 10px}
 
   <div class="tarjeta">
     <h2>4. Tabla de posiciones</h2>
+    <p class="nota">Aquí calculas la tabla con los datos de este navegador (borrador privado). Para que TODOS la vean en la pestaña "Tabla" del sitio, exporta la publicación y súbela: copia el archivo descargado a la carpeta <code>mundial_2026</code> y ejecuta <code>publicar.bat</code>, o pídele a Claude que lo publique.</p>
     <div class="botones">
       <button class="principal" onclick="calcularTabla()">Calcular / actualizar tabla</button>
+      <button class="secundario" onclick="exportarPublicacion()">Exportar publicación (.json)</button>
     </div>
     <div id="cont-tabla"></div>
     <h3>Detalle partido a partido</h3>
@@ -240,6 +261,8 @@ window.onerror = function(mensaje, origen, linea){
 };
 // ==================== DATOS DEL FIXTURE (FIFA, verificado 11-06-2026) ====================
 const DATOS = {"partidos":[{"fase":"A","utc":"2026-06-11T19:00:00Z","local":"México","visita":"Sudáfrica","sede":"Estadio Azteca, Mexico City","id":"m1"},{"fase":"A","utc":"2026-06-12T02:00:00Z","local":"Corea del Sur","visita":"Chequia","sede":"Estadio Akron, Zapopan","id":"m2"},{"fase":"B","utc":"2026-06-12T19:00:00Z","local":"Canadá","visita":"Bosnia y Herzegovina","sede":"BMO Field, Toronto","id":"m3"},{"fase":"D","utc":"2026-06-13T01:00:00Z","local":"Estados Unidos","visita":"Paraguay","sede":"SoFi Stadium, Inglewood","id":"m4"},{"fase":"B","utc":"2026-06-13T19:00:00Z","local":"Catar","visita":"Suiza","sede":"Levi's Stadium, Santa Clara","id":"m5"},{"fase":"C","utc":"2026-06-13T22:00:00Z","local":"Brasil","visita":"Marruecos","sede":"MetLife Stadium, East Rutherford","id":"m6"},{"fase":"C","utc":"2026-06-14T01:00:00Z","local":"Haití","visita":"Escocia","sede":"Gillette Stadium, Foxborough","id":"m7"},{"fase":"D","utc":"2026-06-14T04:00:00Z","local":"Australia","visita":"Turquía","sede":"BC Place, Vancouver","id":"m8"},{"fase":"E","utc":"2026-06-14T17:00:00Z","local":"Alemania","visita":"Curazao","sede":"NRG Stadium, Houston","id":"m9"},{"fase":"F","utc":"2026-06-14T20:00:00Z","local":"Países Bajos","visita":"Japón","sede":"AT&T Stadium, Arlington","id":"m10"},{"fase":"E","utc":"2026-06-14T23:00:00Z","local":"Costa de Marfil","visita":"Ecuador","sede":"Lincoln Financial Field, Philadelphia","id":"m11"},{"fase":"F","utc":"2026-06-15T02:00:00Z","local":"Suecia","visita":"Túnez","sede":"Estadio BBVA, Guadalupe","id":"m12"},{"fase":"H","utc":"2026-06-15T16:00:00Z","local":"España","visita":"Cabo Verde","sede":"Mercedes-Benz Stadium, Atlanta","id":"m13"},{"fase":"G","utc":"2026-06-15T19:00:00Z","local":"Bélgica","visita":"Egipto","sede":"Lumen Field, Seattle","id":"m14"},{"fase":"H","utc":"2026-06-15T22:00:00Z","local":"Arabia Saudita","visita":"Uruguay","sede":"Hard Rock Stadium, Miami Gardens","id":"m15"},{"fase":"G","utc":"2026-06-16T01:00:00Z","local":"Irán","visita":"Nueva Zelanda","sede":"SoFi Stadium, Inglewood","id":"m16"},{"fase":"I","utc":"2026-06-16T19:00:00Z","local":"Francia","visita":"Senegal","sede":"MetLife Stadium, East Rutherford","id":"m17"},{"fase":"I","utc":"2026-06-16T22:00:00Z","local":"Irak","visita":"Noruega","sede":"Gillette Stadium, Foxborough","id":"m18"},{"fase":"J","utc":"2026-06-17T01:00:00Z","local":"Argentina","visita":"Argelia","sede":"Arrowhead Stadium, Kansas City","id":"m19"},{"fase":"J","utc":"2026-06-17T04:00:00Z","local":"Austria","visita":"Jordania","sede":"Levi's Stadium, Santa Clara","id":"m20"},{"fase":"K","utc":"2026-06-17T17:00:00Z","local":"Portugal","visita":"RD del Congo","sede":"NRG Stadium, Houston","id":"m21"},{"fase":"L","utc":"2026-06-17T20:00:00Z","local":"Inglaterra","visita":"Croacia","sede":"AT&T Stadium, Arlington","id":"m22"},{"fase":"L","utc":"2026-06-17T23:00:00Z","local":"Ghana","visita":"Panamá","sede":"BMO Field, Toronto","id":"m23"},{"fase":"K","utc":"2026-06-18T02:00:00Z","local":"Uzbekistán","visita":"Colombia","sede":"Estadio Azteca, Mexico City","id":"m24"},{"fase":"A","utc":"2026-06-18T16:00:00Z","local":"Chequia","visita":"Sudáfrica","sede":"Mercedes-Benz Stadium, Atlanta","id":"m25"},{"fase":"B","utc":"2026-06-18T19:00:00Z","local":"Suiza","visita":"Bosnia y Herzegovina","sede":"SoFi Stadium, Inglewood","id":"m26"},{"fase":"B","utc":"2026-06-18T22:00:00Z","local":"Canadá","visita":"Catar","sede":"BC Place, Vancouver","id":"m27"},{"fase":"A","utc":"2026-06-19T01:00:00Z","local":"México","visita":"Corea del Sur","sede":"Estadio Akron, Zapopan","id":"m28"},{"fase":"D","utc":"2026-06-19T19:00:00Z","local":"Estados Unidos","visita":"Australia","sede":"Lumen Field, Seattle","id":"m29"},{"fase":"C","utc":"2026-06-19T22:00:00Z","local":"Escocia","visita":"Marruecos","sede":"Gillette Stadium, Foxborough","id":"m30"},{"fase":"C","utc":"2026-06-20T00:30:00Z","local":"Brasil","visita":"Haití","sede":"Lincoln Financial Field, Philadelphia","id":"m31"},{"fase":"D","utc":"2026-06-20T03:00:00Z","local":"Turquía","visita":"Paraguay","sede":"Levi's Stadium, Santa Clara","id":"m32"},{"fase":"F","utc":"2026-06-20T17:00:00Z","local":"Países Bajos","visita":"Suecia","sede":"NRG Stadium, Houston","id":"m33"},{"fase":"E","utc":"2026-06-20T20:00:00Z","local":"Alemania","visita":"Costa de Marfil","sede":"BMO Field, Toronto","id":"m34"},{"fase":"E","utc":"2026-06-21T00:00:00Z","local":"Ecuador","visita":"Curazao","sede":"Arrowhead Stadium, Kansas City","id":"m35"},{"fase":"F","utc":"2026-06-21T04:00:00Z","local":"Túnez","visita":"Japón","sede":"Estadio BBVA, Guadalupe","id":"m36"},{"fase":"H","utc":"2026-06-21T16:00:00Z","local":"España","visita":"Arabia Saudita","sede":"Mercedes-Benz Stadium, Atlanta","id":"m37"},{"fase":"G","utc":"2026-06-21T19:00:00Z","local":"Bélgica","visita":"Irán","sede":"SoFi Stadium, Inglewood","id":"m38"},{"fase":"H","utc":"2026-06-21T22:00:00Z","local":"Uruguay","visita":"Cabo Verde","sede":"Hard Rock Stadium, Miami Gardens","id":"m39"},{"fase":"G","utc":"2026-06-22T01:00:00Z","local":"Nueva Zelanda","visita":"Egipto","sede":"BC Place, Vancouver","id":"m40"},{"fase":"J","utc":"2026-06-22T17:00:00Z","local":"Argentina","visita":"Austria","sede":"AT&T Stadium, Arlington","id":"m41"},{"fase":"I","utc":"2026-06-22T21:00:00Z","local":"Francia","visita":"Irak","sede":"Lincoln Financial Field, Philadelphia","id":"m42"},{"fase":"I","utc":"2026-06-23T00:00:00Z","local":"Noruega","visita":"Senegal","sede":"MetLife Stadium, East Rutherford","id":"m43"},{"fase":"J","utc":"2026-06-23T03:00:00Z","local":"Jordania","visita":"Argelia","sede":"Levi's Stadium, Santa Clara","id":"m44"},{"fase":"K","utc":"2026-06-23T17:00:00Z","local":"Portugal","visita":"Uzbekistán","sede":"NRG Stadium, Houston","id":"m45"},{"fase":"L","utc":"2026-06-23T20:00:00Z","local":"Inglaterra","visita":"Ghana","sede":"Gillette Stadium, Foxborough","id":"m46"},{"fase":"L","utc":"2026-06-23T23:00:00Z","local":"Panamá","visita":"Croacia","sede":"BMO Field, Toronto","id":"m47"},{"fase":"K","utc":"2026-06-24T02:00:00Z","local":"Colombia","visita":"RD del Congo","sede":"Estadio Akron, Zapopan","id":"m48"},{"fase":"B","utc":"2026-06-24T19:00:00Z","local":"Suiza","visita":"Canadá","sede":"BC Place, Vancouver","id":"m49"},{"fase":"B","utc":"2026-06-24T19:00:00Z","local":"Bosnia y Herzegovina","visita":"Catar","sede":"Lumen Field, Seattle","id":"m50"},{"fase":"C","utc":"2026-06-24T22:00:00Z","local":"Escocia","visita":"Brasil","sede":"Hard Rock Stadium, Miami Gardens","id":"m51"},{"fase":"C","utc":"2026-06-24T22:00:00Z","local":"Marruecos","visita":"Haití","sede":"Mercedes-Benz Stadium, Atlanta","id":"m52"},{"fase":"A","utc":"2026-06-25T01:00:00Z","local":"Chequia","visita":"México","sede":"Estadio Azteca, Mexico City","id":"m53"},{"fase":"A","utc":"2026-06-25T01:00:00Z","local":"Sudáfrica","visita":"Corea del Sur","sede":"Estadio BBVA, Guadalupe","id":"m54"},{"fase":"E","utc":"2026-06-25T20:00:00Z","local":"Curazao","visita":"Costa de Marfil","sede":"Lincoln Financial Field, Philadelphia","id":"m55"},{"fase":"E","utc":"2026-06-25T20:00:00Z","local":"Ecuador","visita":"Alemania","sede":"MetLife Stadium, East Rutherford","id":"m56"},{"fase":"F","utc":"2026-06-25T23:00:00Z","local":"Japón","visita":"Suecia","sede":"AT&T Stadium, Arlington","id":"m57"},{"fase":"F","utc":"2026-06-25T23:00:00Z","local":"Túnez","visita":"Países Bajos","sede":"Arrowhead Stadium, Kansas City","id":"m58"},{"fase":"D","utc":"2026-06-26T02:00:00Z","local":"Turquía","visita":"Estados Unidos","sede":"SoFi Stadium, Inglewood","id":"m59"},{"fase":"D","utc":"2026-06-26T02:00:00Z","local":"Paraguay","visita":"Australia","sede":"Levi's Stadium, Santa Clara","id":"m60"},{"fase":"I","utc":"2026-06-26T19:00:00Z","local":"Noruega","visita":"Francia","sede":"Gillette Stadium, Foxborough","id":"m61"},{"fase":"I","utc":"2026-06-26T19:00:00Z","local":"Senegal","visita":"Irak","sede":"BMO Field, Toronto","id":"m62"},{"fase":"H","utc":"2026-06-27T00:00:00Z","local":"Cabo Verde","visita":"Arabia Saudita","sede":"NRG Stadium, Houston","id":"m63"},{"fase":"H","utc":"2026-06-27T00:00:00Z","local":"Uruguay","visita":"España","sede":"Estadio Akron, Zapopan","id":"m64"},{"fase":"G","utc":"2026-06-27T03:00:00Z","local":"Egipto","visita":"Irán","sede":"Lumen Field, Seattle","id":"m65"},{"fase":"G","utc":"2026-06-27T03:00:00Z","local":"Nueva Zelanda","visita":"Bélgica","sede":"BC Place, Vancouver","id":"m66"},{"fase":"L","utc":"2026-06-27T21:00:00Z","local":"Panamá","visita":"Inglaterra","sede":"MetLife Stadium, East Rutherford","id":"m67"},{"fase":"L","utc":"2026-06-27T21:00:00Z","local":"Croacia","visita":"Ghana","sede":"Lincoln Financial Field, Philadelphia","id":"m68"},{"fase":"K","utc":"2026-06-27T23:30:00Z","local":"Colombia","visita":"Portugal","sede":"Hard Rock Stadium, Miami Gardens","id":"m69"},{"fase":"K","utc":"2026-06-27T23:30:00Z","local":"RD del Congo","visita":"Uzbekistán","sede":"Mercedes-Benz Stadium, Atlanta","id":"m70"},{"fase":"J","utc":"2026-06-28T02:00:00Z","local":"Argelia","visita":"Austria","sede":"Arrowhead Stadium, Kansas City","id":"m71"},{"fase":"J","utc":"2026-06-28T02:00:00Z","local":"Jordania","visita":"Argentina","sede":"AT&T Stadium, Arlington","id":"m72"},{"fase":"R32","utc":"2026-06-28T19:00:00Z","local":"2.º Grupo A","visita":"2.º Grupo B","sede":"SoFi Stadium, Inglewood","id":"m73"},{"fase":"R32","utc":"2026-06-29T17:00:00Z","local":"1.º Grupo C","visita":"2.º Grupo F","sede":"NRG Stadium, Houston","id":"m74"},{"fase":"R32","utc":"2026-06-29T20:30:00Z","local":"1.º Grupo E","visita":"3.º Grupos A/B/C/D/F","sede":"Gillette Stadium, Foxborough","id":"m75"},{"fase":"R32","utc":"2026-06-30T01:00:00Z","local":"1.º Grupo F","visita":"2.º Grupo C","sede":"Estadio BBVA, Guadalupe","id":"m76"},{"fase":"R32","utc":"2026-06-30T17:00:00Z","local":"2.º Grupo E","visita":"2.º Grupo I","sede":"AT&T Stadium, Arlington","id":"m77"},{"fase":"R32","utc":"2026-06-30T21:00:00Z","local":"1.º Grupo I","visita":"3.º Grupos C/D/F/G/H","sede":"MetLife Stadium, East Rutherford","id":"m78"},{"fase":"R32","utc":"2026-07-01T01:00:00Z","local":"1.º Grupo A","visita":"3.º Grupos C/E/F/H/I","sede":"Estadio Azteca, Mexico City","id":"m79"},{"fase":"R32","utc":"2026-07-01T16:00:00Z","local":"1.º Grupo L","visita":"3.º Grupos E/H/I/J/K","sede":"Mercedes-Benz Stadium, Atlanta","id":"m80"},{"fase":"R32","utc":"2026-07-01T20:00:00Z","local":"1.º Grupo G","visita":"3.º Grupos A/E/H/I/J","sede":"Lumen Field, Seattle","id":"m81"},{"fase":"R32","utc":"2026-07-02T00:00:00Z","local":"1.º Grupo D","visita":"3.º Grupos B/E/F/I/J","sede":"Levi's Stadium, Santa Clara","id":"m82"},{"fase":"R32","utc":"2026-07-02T19:00:00Z","local":"1.º Grupo H","visita":"2.º Grupo J","sede":"SoFi Stadium, Inglewood","id":"m83"},{"fase":"R32","utc":"2026-07-02T23:00:00Z","local":"2.º Grupo K","visita":"2.º Grupo L","sede":"BMO Field, Toronto","id":"m84"},{"fase":"R32","utc":"2026-07-03T03:00:00Z","local":"1.º Grupo B","visita":"3.º Grupos E/F/G/I/J","sede":"BC Place, Vancouver","id":"m85"},{"fase":"R32","utc":"2026-07-03T18:00:00Z","local":"2.º Grupo D","visita":"2.º Grupo G","sede":"AT&T Stadium, Arlington","id":"m86"},{"fase":"R32","utc":"2026-07-03T22:00:00Z","local":"1.º Grupo J","visita":"2.º Grupo H","sede":"Hard Rock Stadium, Miami Gardens","id":"m87"},{"fase":"R32","utc":"2026-07-04T01:30:00Z","local":"1.º Grupo K","visita":"3.º Grupos D/E/I/J/L","sede":"Arrowhead Stadium, Kansas City","id":"m88"},{"fase":"R16","utc":"2026-07-04T17:00:00Z","local":"Ganador P 73","visita":"Ganador P 75","sede":"NRG Stadium, Houston","id":"m89"},{"fase":"R16","utc":"2026-07-04T21:00:00Z","local":"Ganador P 74","visita":"Ganador P 77","sede":"Lincoln Financial Field, Philadelphia","id":"m90"},{"fase":"R16","utc":"2026-07-05T20:00:00Z","local":"Ganador P 76","visita":"Ganador P 78","sede":"MetLife Stadium, East Rutherford","id":"m91"},{"fase":"R16","utc":"2026-07-06T00:00:00Z","local":"Ganador P 79","visita":"Ganador P 80","sede":"Estadio Azteca, Mexico City","id":"m92"},{"fase":"R16","utc":"2026-07-06T19:00:00Z","local":"Ganador P 83","visita":"Ganador P 84","sede":"AT&T Stadium, Arlington","id":"m93"},{"fase":"R16","utc":"2026-07-07T00:00:00Z","local":"Ganador P 81","visita":"Ganador P 82","sede":"Lumen Field, Seattle","id":"m94"},{"fase":"R16","utc":"2026-07-07T16:00:00Z","local":"Ganador P 86","visita":"Ganador P 88","sede":"Mercedes-Benz Stadium, Atlanta","id":"m95"},{"fase":"R16","utc":"2026-07-07T20:00:00Z","local":"Ganador P 85","visita":"Ganador P 87","sede":"BC Place, Vancouver","id":"m96"},{"fase":"QF","utc":"2026-07-09T20:00:00Z","local":"Ganador P 89","visita":"Ganador P 90","sede":"Gillette Stadium, Foxborough","id":"m97"},{"fase":"QF","utc":"2026-07-10T19:00:00Z","local":"Ganador P 93","visita":"Ganador P 94","sede":"SoFi Stadium, Inglewood","id":"m98"},{"fase":"QF","utc":"2026-07-11T21:00:00Z","local":"Ganador P 91","visita":"Ganador P 92","sede":"Hard Rock Stadium, Miami Gardens","id":"m99"},{"fase":"QF","utc":"2026-07-12T01:00:00Z","local":"Ganador P 95","visita":"Ganador P 96","sede":"Arrowhead Stadium, Kansas City","id":"m100"},{"fase":"SF","utc":"2026-07-14T19:00:00Z","local":"Ganador P 97","visita":"Ganador P 98","sede":"AT&T Stadium, Arlington","id":"m101"},{"fase":"SF","utc":"2026-07-15T19:00:00Z","local":"Ganador P 99","visita":"Ganador P 100","sede":"Mercedes-Benz Stadium, Atlanta","id":"m102"},{"fase":"3P","utc":"2026-07-18T21:00:00Z","local":"Perdedor P 101","visita":"Perdedor P 102","sede":"Hard Rock Stadium, Miami Gardens","id":"m103"},{"fase":"FIN","utc":"2026-07-19T19:00:00Z","local":"Ganador P 101","visita":"Ganador P 102","sede":"MetLife Stadium, East Rutherford","id":"m104"}],"equipos":["Alemania","Arabia Saudita","Argelia","Argentina","Australia","Austria","Bosnia y Herzegovina","Brasil","Bélgica","Cabo Verde","Canadá","Catar","Chequia","Colombia","Corea del Sur","Costa de Marfil","Croacia","Curazao","Ecuador","Egipto","Escocia","España","Estados Unidos","Francia","Ghana","Haití","Inglaterra","Irak","Irán","Japón","Jordania","Marruecos","México","Noruega","Nueva Zelanda","Panamá","Paraguay","Países Bajos","Portugal","RD del Congo","Senegal","Sudáfrica","Suecia","Suiza","Turquía","Túnez","Uruguay","Uzbekistán"],"banderas":{"México":"🇲🇽","Sudáfrica":"🇿🇦","Corea del Sur":"🇰🇷","Chequia":"🇨🇿","Canadá":"🇨🇦","Bosnia y Herzegovina":"🇧🇦","Catar":"🇶🇦","Suiza":"🇨🇭","Brasil":"🇧🇷","Marruecos":"🇲🇦","Haití":"🇭🇹","Escocia":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Estados Unidos":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Turquía":"🇹🇷","Alemania":"🇩🇪","Curazao":"🇨🇼","Costa de Marfil":"🇨🇮","Ecuador":"🇪🇨","Países Bajos":"🇳🇱","Japón":"🇯🇵","Túnez":"🇹🇳","Suecia":"🇸🇪","Bélgica":"🇧🇪","Egipto":"🇪🇬","Irán":"🇮🇷","Nueva Zelanda":"🇳🇿","España":"🇪🇸","Cabo Verde":"🇨🇻","Arabia Saudita":"🇸🇦","Uruguay":"🇺🇾","Francia":"🇫🇷","Senegal":"🇸🇳","Noruega":"🇳🇴","Irak":"🇮🇶","Argentina":"🇦🇷","Argelia":"🇩🇿","Austria":"🇦🇹","Jordania":"🇯🇴","Portugal":"🇵🇹","Colombia":"🇨🇴","Uzbekistán":"🇺🇿","RD del Congo":"🇨🇩","Inglaterra":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Croacia":"🇭🇷","Ghana":"🇬🇭","Panamá":"🇵🇦"}};
+// Instantánea publicada por el organizador (null si aún no publica); se hornea al construir el HTML
+const PUBLICACION = null;
 const PARTIDOS = DATOS.partidos, EQUIPOS = DATOS.equipos, BANDERAS = DATOS.banderas;
 const FASES = {R32:'Dieciseisavos de final', R16:'Octavos de final', QF:'Cuartos de final', SF:'Semifinales', '3P':'Tercer puesto', FIN:'Final'};
 const ORDEN_FASES = ['A','B','C','D','E','F','G','H','I','J','K','L','R32','R16','QF','SF','3P','FIN'];
@@ -621,23 +644,26 @@ function renderBonosReales(){
   $('real-goleador').value = bonosReales.goleador || ''; $('real-revelacion').value = bonosReales.revelacion || '';
 }
 
-// ==================== TABLA DE POSICIONES ====================
-function calcularTabla(){
-  const jugados = PARTIDOS.filter(m => esValido(resultados[m.id]));
-  const filas = participantes.map(p => {
+// ==================== CLASIFICACIÓN (compartida: Organizador y pestaña Tabla) ====================
+function construyeClasificacion(parts, res, bReales){
+  const jugados = PARTIDOS.filter(m => esValido(res[m.id]));
+  const filas = parts.map(p => {
     let pts = 0, e4 = 0, d3 = 0, t2 = 0;
     for (const m of jugados){
-      const pu = puntosPartido(p.pron[m.id], resultados[m.id]);
+      const pu = puntosPartido(p.pron[m.id], res[m.id]);
       if (pu === null) continue;
       pts += pu;
       if (pu === 4) e4++; else if (pu === 3) d3++; else if (pu === 2) t2++;
     }
-    const b = puntosBonos(p.bonos, bonosReales);
+    const b = puntosBonos(p.bonos, bReales);
     return {nombre:p.nombre, pts:pts + b.pts, e4, d3, t2, bonos:b.pts, detBonos:b.det,
-            acertoCampeon: !!(p.bonos && bonosReales && p.bonos.campeon && p.bonos.campeon === bonosReales.campeon)};
+            acertoCampeon: !!(p.bonos && bReales && p.bonos.campeon && p.bonos.campeon === bReales.campeon)};
   });
   filas.sort((a, b) => b.pts - a.pts || b.e4 - a.e4 || b.d3 - a.d3 || (b.acertoCampeon - a.acertoCampeon) || a.nombre.localeCompare(b.nombre));
-  if (!filas.length){ $('cont-tabla').innerHTML = '<p class="nota">Importa participantes primero.</p>'; $('cont-matriz').innerHTML = ''; return; }
+  return {filas, jugados};
+}
+function htmlTablaPos(filas, jugados){
+  if (!filas.length) return '<p class="nota">Sin participantes.</p>';
   let html = '<p class="nota">' + jugados.length + ' partidos con resultado cargado.</p><table class="tabla-pos"><tr><th>#</th><th>Participante</th><th>Pts</th><th>Exactos</th><th>Difs</th><th>Ganador</th><th>Bonos</th></tr>';
   let pos = 0, prevPts = null;
   filas.forEach((f, i) => {
@@ -646,18 +672,18 @@ function calcularTabla(){
       '</td><td class="num"><strong>' + f.pts + '</strong></td><td class="num">' + f.e4 + '</td><td class="num">' + f.d3 +
       '</td><td class="num">' + f.t2 + '</td><td class="num" title="' + escapaHTML(f.detBonos.join(', ')) + '">' + f.bonos + '</td></tr>';
   });
-  $('cont-tabla').innerHTML = html + '</table>';
-  renderMatriz(jugados, filas.map(f => f.nombre));
+  return html + '</table>';
 }
-function renderMatriz(jugados, ordenNombres){
-  if (!jugados.length || !participantes.length){ $('cont-matriz').innerHTML = ''; return; }
-  const porNombre = {}; participantes.forEach(p => porNombre[p.nombre] = p);
+function htmlMatriz(jugados, parts, res, ordenNombres, crucesPub){
+  if (!jugados.length || !parts.length) return '<p class="nota">Aún no hay partidos con resultado.</p>';
+  const porNombre = {}; parts.forEach(p => porNombre[p.nombre] = p);
   let html = '<table class="matriz"><thead><tr><th class="fija">Partido</th><th>Real</th>' +
     ordenNombres.map(n => '<th>' + escapaHTML(n) + '</th>').join('') + '</tr></thead><tbody>';
   for (const m of jugados){
-    const [eL, eV] = equiposDe(m) || [m.local, m.visita];
-    const r = resultados[m.id];
-    html += '<tr><td class="fija">' + bandera(eL) + ' ' + escapaHTML(eL) + ' - ' + escapaHTML(eV) + ' ' + bandera(eV) +
+    const eqs = (crucesPub && Array.isArray(crucesPub[m.id]) && crucesPub[m.id][0] && crucesPub[m.id][1])
+      ? crucesPub[m.id] : (equiposDe(m) || [m.local, m.visita]);
+    const r = res[m.id];
+    html += '<tr><td class="fija">' + bandera(eqs[0]) + ' ' + escapaHTML(eqs[0]) + ' - ' + escapaHTML(eqs[1]) + ' ' + bandera(eqs[1]) +
       '</td><td><strong>' + r[0] + '-' + r[1] + '</strong></td>';
     for (const n of ordenNombres){
       const p = porNombre[n].pron[m.id];
@@ -666,16 +692,63 @@ function renderMatriz(jugados, ordenNombres){
     }
     html += '</tr>';
   }
-  $('cont-matriz').innerHTML = html + '</tbody></table>';
+  return html + '</tbody></table>';
+}
+function htmlBonosJugadores(parts, bReales){
+  if (!parts.length) return '<p class="nota">Sin participantes.</p>';
+  if (!bonosCerrados()) return '<p class="nota">Los bonos de cada jugador se mostrarán cuando se cierren (12 de junio, 23:59 hora de Chile), para que nadie copie.</p>';
+  let html = '<table class="matriz"><thead><tr><th class="fija">Participante</th><th>Campeón</th><th>Finalistas</th><th>Goleador</th><th>Revelación</th><th>Pts bonos</th></tr></thead><tbody>';
+  for (const p of parts){
+    const b = p.bonos || {};
+    const pb = puntosBonos(b, bReales);
+    html += '<tr><td class="fija">' + escapaHTML(p.nombre) + '</td><td>' + escapaHTML(b.campeon || '—') +
+      '</td><td>' + escapaHTML([b.fin1, b.fin2].filter(Boolean).join(' y ') || '—') +
+      '</td><td>' + escapaHTML(b.goleador || '—') + '</td><td>' + escapaHTML(b.revelacion || '—') +
+      '</td><td class="num"><strong>' + pb.pts + '</strong></td></tr>';
+  }
+  return html + '</tbody></table>';
+}
+
+// ---- Organizador: tabla con los datos locales de este navegador ----
+function calcularTabla(){
+  if (!participantes.length){ $('cont-tabla').innerHTML = '<p class="nota">Importa participantes primero.</p>'; $('cont-matriz').innerHTML = ''; return; }
+  const c = construyeClasificacion(participantes, resultados, bonosReales);
+  $('cont-tabla').innerHTML = htmlTablaPos(c.filas, c.jugados);
+  $('cont-matriz').innerHTML = htmlMatriz(c.jugados, participantes, resultados, c.filas.map(f => f.nombre), null);
+}
+
+// ---- Pestaña Tabla: datos publicados por el organizador (incrustados al construir) ----
+function renderTablaPublica(){
+  if (!PUBLICACION || !Array.isArray(PUBLICACION.participantes) || !PUBLICACION.participantes.length){
+    $('pub-info').textContent = 'El organizador aún no publica la tabla. Vuelve cuando se jueguen los primeros partidos.';
+    $('pub-tabla').innerHTML = ''; $('pub-bonos').innerHTML = ''; $('pub-matriz').innerHTML = '';
+    return;
+  }
+  const parts = PUBLICACION.participantes.map(p => ({nombre:String(p.nombre || '').slice(0,30), pron:sanitizaPron(p.pron || {}), bonos:p.bonos || {}}));
+  const res = sanitizaPron(PUBLICACION.res || {});
+  const br = PUBLICACION.bonosReales || {};
+  const c = construyeClasificacion(parts, res, br);
+  $('pub-info').textContent = (PUBLICACION.exportado && !isNaN(Date.parse(PUBLICACION.exportado)))
+    ? 'Actualizada el ' + new Date(PUBLICACION.exportado).toLocaleString('es-CL') + '.' : '';
+  $('pub-tabla').innerHTML = htmlTablaPos(c.filas, c.jugados);
+  $('pub-bonos').innerHTML = htmlBonosJugadores(parts, br);
+  $('pub-matriz').innerHTML = htmlMatriz(c.jugados, parts, res, c.filas.map(f => f.nombre), PUBLICACION.cruces || null);
+}
+function exportarPublicacion(){
+  if (!participantes.length){ msj('msj-admin', 'Importa participantes antes de exportar la publicación.'); return; }
+  descarga('publicacion.json', {tipo:'publicacion', version:1, exportado:new Date().toISOString(),
+    participantes, res:resultados, bonosReales, cruces});
+  msj('msj-admin', 'Archivo "publicacion.json" descargado. Cópialo a la carpeta mundial_2026 y ejecuta publicar.bat (o pídele a Claude publicarlo); la pestaña Tabla del sitio quedará actualizada para todos.', true);
 }
 
 // ==================== PESTAÑAS Y ARRANQUE ====================
 function verTab(t){
-  for (const s of ['pron','reglas','admin']){
+  for (const s of ['pron','tabla','reglas','admin']){
     $('sec-' + s).classList.toggle('oculto', s !== t);
     $('tab-' + s).classList.toggle('activa', s === t);
   }
   if (t === 'admin'){ renderParticipantes(); renderResultados(); renderCruces(); renderBonosReales(); }
+  if (t === 'tabla') renderTablaPublica();
 }
 function renderTodo(){
   renderPron(); renderBonos();
