@@ -294,8 +294,9 @@ const CIERRES_ESPECIALES = { m1: '2026-06-11T20:00:00Z' };      // inaugural: gr
 const CIERRE_BONOS = '2026-06-13T03:59:00Z';                    // bonos: hasta el 12-jun 23:59 hora de Chile
 function cerrado(m){ return Date.now() > Date.parse(CIERRES_ESPECIALES[m.id] || m.utc); }
 function bonosCerrados(){ return Date.now() > Date.parse(CIERRE_BONOS); }
+// Todas las horas se muestran en hora de Chile (America/Santiago), igual para todos los dispositivos.
 function fmtFecha(utc){
-  return new Date(utc).toLocaleString('es-CL', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+  return new Date(utc).toLocaleString('es-CL', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZone:'America/Santiago'}) + ' (Chile)';
 }
 // Bandera como imagen (se ve igual en Windows/Android/iPhone). Si falla la red, cae al emoji.
 function bandera(eq){
@@ -496,7 +497,7 @@ function textoPron(){
     lineas.push('', (fase.length === 1 ? 'GRUPO ' + fase : FASES[fase].toUpperCase()));
     for (const m of ms){
       const [eL, eV] = equiposDe(m);
-      const d = new Date(m.utc).toLocaleDateString('es-CL', {day:'numeric', month:'short'});
+      const d = new Date(m.utc).toLocaleDateString('es-CL', {day:'numeric', month:'short', timeZone:'America/Santiago'});
       lineas.push(d + ' · ' + eL + ' ' + pron[m.id][0] + '-' + pron[m.id][1] + ' ' + eV);
     }
   }
@@ -593,7 +594,7 @@ function renderParticipantes(){
   $('lista-part').innerHTML = participantes.length
     ? participantes.map((p, i) => '<li><strong>' + escapaHTML(p.nombre) + '</strong> — ' +
         Object.keys(p.pron).length + ' pronósticos' +
-        ((p.exportado && !isNaN(Date.parse(p.exportado))) ? ' (exportado ' + new Date(p.exportado).toLocaleString('es-CL') + ')' : '') +
+        ((p.exportado && !isNaN(Date.parse(p.exportado))) ? ' (exportado ' + new Date(p.exportado).toLocaleString('es-CL', {timeZone:'America/Santiago'}) + ')' : '') +
         '<button onclick="quitarParticipante(' + i + ')">quitar</button></li>').join('')
     : '<li class="nota">Aún no hay participantes importados.</li>';
 }
@@ -737,7 +738,7 @@ function renderTablaPublica(){
   const br = PUBLICACION.bonosReales || {};
   const c = construyeClasificacion(parts, res, br);
   $('pub-info').textContent = (PUBLICACION.exportado && !isNaN(Date.parse(PUBLICACION.exportado)))
-    ? 'Actualizada el ' + new Date(PUBLICACION.exportado).toLocaleString('es-CL') + '.' : '';
+    ? 'Actualizada el ' + new Date(PUBLICACION.exportado).toLocaleString('es-CL', {timeZone:'America/Santiago'}) + ' (hora de Chile).' : '';
   $('pub-tabla').innerHTML = htmlTablaPos(c.filas, c.jugados);
   $('pub-bonos').innerHTML = htmlBonosJugadores(parts, br);
   $('pub-matriz').innerHTML = htmlMatriz(c.jugados, parts, res, c.filas.map(f => f.nombre), PUBLICACION.cruces || null);
