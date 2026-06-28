@@ -112,7 +112,7 @@ footer{text-align:center;font-size:.75rem;color:var(--gris);padding:20px 10px}
     <div class="progreso"><span id="prog-texto">0 / 72 partidos pronosticados</span>
       <div class="barra"><div id="prog-barra"></div></div>
     </div>
-    <div class="aviso">Cada partido se cierra automáticamente a la hora de su inicio (horarios mostrados en tu hora local). Excepción inicial: el partido inaugural se puede pronosticar hasta las 16:00 de Chile del 11-jun, y los bonos hasta el 12-jun a las 23:59. Las eliminatorias se habilitan cuando se conozcan los cruces: el organizador enviará un archivo de actualización para importar aquí.</div>
+    <div class="aviso">Cada partido se cierra automáticamente a la hora de su inicio (horarios mostrados en tu hora local). Excepción inicial: el partido inaugural se puede pronosticar hasta las 16:00 de Chile del 11-jun, y los bonos hasta el 12-jun a las 23:59. Las eliminatorias aparecen automáticamente cuando se conocen los cruces (no hay que importar nada): basta recargar la página.</div>
     <div class="botones">
       <button class="principal" onclick="copiarTexto()">Copiar texto para WhatsApp</button>
       <button class="principal" onclick="exportarPron()">Exportar archivo (.json)</button>
@@ -285,8 +285,10 @@ let participantes = lee('participantes', []); // [{nombre, exportado, pron, bono
 const $ = id => document.getElementById(id);
 function equiposDe(m){
   if (m.fase.length === 1) return [m.local, m.visita];      // grupos: nunca se sobreescriben
-  const c = cruces[m.id];
-  return (Array.isArray(c) && c[0] && c[1]) ? c : null;     // eliminatorias: solo cruces completos
+  // eliminatorias: usar los cruces publicados por el organizador (visibles para todos sin importar nada);
+  // los cruces locales del navegador, si existen, tienen prioridad
+  const c = cruces[m.id] || (PUBLICACION && PUBLICACION.cruces && PUBLICACION.cruces[m.id]);
+  return (Array.isArray(c) && c[0] && c[1]) ? c : null;     // solo cruces completos
 }
 function definido(m){ return equiposDe(m) !== null; }
 // Cierres especiales fijados por el organizador (UTC); si un partido no aparece aquí, cierra a su hora de inicio
